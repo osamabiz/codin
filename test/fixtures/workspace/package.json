@@ -1,0 +1,5 @@
+{
+  "name": "vscode-agent",
+  "version": "0.1.0",
+  "description": "Test fixture workspace for integration and E2E tests"
+}

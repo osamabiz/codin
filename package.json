@@ -1,0 +1,162 @@
+{
+  "name": "vscode-agent",
+  "displayName": "AI Coding Agent",
+  "description": "Open-source VS Code agent powered by your own Claude, OpenAI, or Gemini subscription. Plans, writes, edits, and tests code autonomously. Free forever.",
+  "version": "0.1.0",
+  "publisher": "open-source",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other", "Machine Learning"],
+  "keywords": ["ai", "agent", "claude", "openai", "coding", "automation", "llm"],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentPlugin.openChat",
+        "title": "Agent: Open Chat"
+      },
+      {
+        "command": "agentPlugin.openSettings",
+        "title": "Agent: Open Settings"
+      },
+      {
+        "command": "agentPlugin.newChat",
+        "title": "Agent: New Chat"
+      },
+      {
+        "command": "agentPlugin.stopAgent",
+        "title": "Agent: Stop"
+      },
+      {
+        "command": "agentPlugin.toggleDryRun",
+        "title": "Agent: Toggle Dry Run"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "agentPlugin",
+          "title": "AI Agent",
+          "icon": "media/robot.svg"
+        }
+      ]
+    },
+    "views": {
+      "agentPlugin": [
+        {
+          "id": "agentPlugin.sidebar",
+          "name": "Agent"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "agentPlugin.openChat",
+        "key": "ctrl+shift+alt+a",
+        "mac": "cmd+shift+alt+a"
+      }
+    ],
+    "configuration": {
+      "title": "AI Coding Agent",
+      "properties": {
+        "agentPlugin.provider": {
+          "type": "string",
+          "default": "claude",
+          "enum": ["claude", "openai", "gemini", "ollama"],
+          "enumDescriptions": [
+            "Anthropic Claude (recommended)",
+            "OpenAI GPT models",
+            "Google Gemini",
+            "Local Ollama (no API key required)"
+          ],
+          "description": "LLM provider to use for the agent."
+        },
+        "agentPlugin.model": {
+          "type": "string",
+          "default": "claude-sonnet-4",
+          "description": "Model to use with the selected provider."
+        },
+        "agentPlugin.maxSteps": {
+          "type": "number",
+          "default": 25,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Maximum steps the agent can take before pausing to ask for confirmation."
+        },
+        "agentPlugin.maxRetries": {
+          "type": "number",
+          "default": 3,
+          "minimum": 0,
+          "maximum": 10,
+          "description": "How many times the agent re-plans after a tool failure."
+        },
+        "agentPlugin.autoApproveReadOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically approve read-only tool calls (read_file, grep_codebase, git_status) without showing a confirmation card."
+        },
+        "agentPlugin.checkpointBeforeEdit": {
+          "type": "boolean",
+          "default": false,
+          "description": "Create a git commit before any write_file or delete_file operation to provide a rollback point."
+        },
+        "agentPlugin.blockedCommands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["rm -rf /", "sudo"],
+          "description": "Shell command patterns the agent is not allowed to run."
+        },
+        "agentPlugin.allowedWriteDirectories": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Restrict file writes to these paths (relative to workspace root). Empty = entire workspace allowed."
+        },
+        "agentPlugin.temperature": {
+          "type": "number",
+          "default": 0.7,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Temperature (randomness) for LLM responses. 0 = deterministic, 1 = very creative."
+        },
+        "agentPlugin.maxTokens": {
+          "type": "number",
+          "default": 4096,
+          "minimum": 256,
+          "maximum": 32768,
+          "description": "Maximum tokens the model can generate per response."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vscode-test",
+    "test:e2e": "playwright test",
+    "test:all": "npm test && npm run test:integration && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vscode/test-cli": "^0.0.6",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.57.0",
+    "express": "^4.18.2",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}

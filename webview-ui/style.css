@@ -1,0 +1,19 @@
+/* All colours use VS Code CSS variables — never hardcoded hex. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-editor-foreground);
+  background-color: var(--vscode-editor-background);
+  line-height: 1.5;
+}
+
+/* TODO(phase-1): message bubbles, tool cards, context pills, input area */

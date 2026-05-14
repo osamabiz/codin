@@ -1,0 +1,57 @@
+name: Feature request
+description: Suggest a new feature or improvement
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! Please describe what you'd like to see and why it would be useful.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the pain point or use case. "I'm frustrated when…" or "I need to be able to…"
+      placeholder: "e.g. I often need to run the agent on just a specific subdirectory but there's no way to restrict context."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like this to work? UI mockup, command name, configuration key — whatever helps.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Have you tried any workarounds? Are there other ways this could be designed?
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Agent behaviour (loop, planning, tools)
+        - LLM provider support
+        - UI / chat panel
+        - Settings
+        - Security / safety controls
+        - Performance
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+        - label: This fits within the project scope (local VS Code extension, no backend)
+          required: true
