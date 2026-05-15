@@ -16,12 +16,12 @@ function makeSecrets(stored: Record<string, string> = {}) {
 
 describe('SettingsManager — SecretStorage', () => {
   it('getApiKey retrieves value under the namespaced key', async () => {
-    const secrets = makeSecrets({ 'agentPlugin.apiKey.claude': 'sk-abc123' });
+    const secrets = makeSecrets({ 'codin.apiKey.claude': 'sk-abc123' });
     const mgr = new SettingsManager(secrets as unknown as vscode.SecretStorage);
 
     const key = await mgr.getApiKey('claude');
 
-    expect(secrets.get).toHaveBeenCalledWith('agentPlugin.apiKey.claude');
+    expect(secrets.get).toHaveBeenCalledWith('codin.apiKey.claude');
     expect(key).toBe('sk-abc123');
   });
 
@@ -38,7 +38,7 @@ describe('SettingsManager — SecretStorage', () => {
 
     await mgr.setApiKey('openai', 'sk-openai-xyz');
 
-    expect(secrets.store).toHaveBeenCalledWith('agentPlugin.apiKey.openai', 'sk-openai-xyz');
+    expect(secrets.store).toHaveBeenCalledWith('codin.apiKey.openai', 'sk-openai-xyz');
   });
 
   it('getApiKey + setApiKey round-trips correctly', async () => {
@@ -84,7 +84,7 @@ describe('SettingsManager — workspace configuration', () => {
 
     const result = mgr.getProvider();
 
-    expect(vscodeMock.workspace.getConfiguration).toHaveBeenCalledWith('agentPlugin');
+    expect(vscodeMock.workspace.getConfiguration).toHaveBeenCalledWith('codin');
     expect(mockGet).toHaveBeenCalledWith('provider', 'claude');
     expect(result).toBe('openai');
   });

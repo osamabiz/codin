@@ -15,8 +15,8 @@ export class SettingsPanel {
     }
 
     const panel = vscode.window.createWebviewPanel(
-      'agentPlugin.settings',
-      'AI Agent Settings',
+      'codin.settings',
+      'Codin Settings',
       vscode.ViewColumn.One,
       { enableScripts: true, localResourceRoots: [extensionUri] }
     );
@@ -48,15 +48,18 @@ export class SettingsPanel {
         const apiKey = msg['apiKey'] as string;
         const model = msg['model'] as string;
         const temperature = msg['temperature'] as number;
+        const customBaseUrl = (msg['customBaseUrl'] as string | undefined) ?? '';
         if (apiKey) {
           await this._settings.setApiKey(provider, apiKey);
-          configureProvider(provider, apiKey);
         }
-        const cfg = vscode.workspace.getConfiguration('agentPlugin');
+        const resolvedKey = apiKey || (await this._settings.getApiKey(provider));
+        configureProvider(provider, resolvedKey, customBaseUrl || undefined);
+        const cfg = vscode.workspace.getConfiguration('codin');
         await cfg.update('provider', provider, vscode.ConfigurationTarget.Global);
         await cfg.update('model', model, vscode.ConfigurationTarget.Global);
         await cfg.update('temperature', temperature, vscode.ConfigurationTarget.Global);
-        void vscode.window.showInformationMessage('AI Agent: settings saved.');
+        await cfg.update('customBaseUrl', customBaseUrl, vscode.ConfigurationTarget.Global);
+        void vscode.window.showInformationMessage('Codin: settings saved.');
         break;
       }
 
@@ -65,7 +68,7 @@ export class SettingsPanel {
         const value = msg['value'] as string[];
         const allowedKeys = ['blockedCommands', 'allowedWriteDirectories'];
         if (allowedKeys.includes(key)) {
-          const cfg = vscode.workspace.getConfiguration('agentPlugin');
+          const cfg = vscode.workspace.getConfiguration('codin');
           await cfg.update(key, value, vscode.ConfigurationTarget.Global);
         }
         break;
@@ -74,8 +77,9 @@ export class SettingsPanel {
       case 'testConnection': {
         const provider = msg['provider'] as string;
         const apiKey = msg['apiKey'] as string | undefined;
+        const customBaseUrl = (msg['customBaseUrl'] as string | undefined) ?? '';
         const keyToUse = apiKey || (await this._settings.getApiKey(provider));
-        configureProvider(provider, keyToUse);
+        configureProvider(provider, keyToUse, customBaseUrl || undefined);
         try {
           const result = await getProvider(provider).testConnection();
           void this._panel.webview.postMessage({ command: 'testResult', ...result });
@@ -95,8 +99,9 @@ export class SettingsPanel {
     const provider = this._settings.getProvider();
     const model = this._settings.getModel();
     const temperature = this._settings.getTemperature();
+    const customBaseUrl = this._settings.getBaseUrl();
     const storedKey = await this._settings.getApiKey(provider);
-    const cfg = vscode.workspace.getConfiguration('agentPlugin');
+    const cfg = vscode.workspace.getConfiguration('codin');
     const blockedCommands = cfg.get<string[]>('blockedCommands', ['rm -rf /', 'sudo']);
     const allowedWriteDirectories = cfg.get<string[]>('allowedWriteDirectories', []);
     void this._panel.webview.postMessage({
@@ -104,6 +109,7 @@ export class SettingsPanel {
       provider,
       model,
       temperature,
+      customBaseUrl,
       hasApiKey: storedKey.length > 0,
       blockedCommands,
       allowedWriteDirectories,
@@ -121,7 +127,7 @@ export class SettingsPanel {
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'none'; script-src 'nonce-${nonce}'; style-src ${csp} 'unsafe-inline';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Agent Settings</title>
+  <title>Codin Settings</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body {
@@ -212,16 +218,31 @@ export class SettingsPanel {
   </style>
 </head>
 <body>
-  <h2>AI Agent Settings</h2>
+  <h2>Codin Settings</h2>
 
   <h3>LLM Provider</h3>
 
   <div class="field">
     <label for="provider">Provider</label>
     <select id="provider">
-      <option value="claude">Claude (Anthropic)</option>
-      <option value="openai">OpenAI</option>
-      <option value="ollama">Ollama (local, no key needed)</option>
+      <optgroup label="Cloud AI">
+        <option value="claude">Claude (Anthropic)</option>
+        <option value="openai">OpenAI</option>
+        <option value="mistral">Mistral AI</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="moonshot">Moonshot AI</option>
+        <option value="kimi">Kimi (Moonshot AI)</option>
+        <option value="qwen">Qwen (Alibaba Cloud)</option>
+        <option value="minimax">MiniMax</option>
+      </optgroup>
+      <optgroup label="Local">
+        <option value="ollama">Ollama (local)</option>
+        <option value="lmstudio">LM Studio (local)</option>
+        <option value="jan">Jan.ai (local)</option>
+      </optgroup>
+      <optgroup label="Custom">
+        <option value="openai-compatible">Custom (OpenAI-compatible)</option>
+      </optgroup>
     </select>
   </div>
 
@@ -231,9 +252,16 @@ export class SettingsPanel {
     <p class="hint">Stored in VS Code SecretStorage — never logged or synced.</p>
   </div>
 
+  <div class="field" id="baseUrlField" style="display:none">
+    <label for="baseUrl">Base URL</label>
+    <input type="text" id="baseUrl" placeholder="e.g. http://localhost:1234/v1">
+    <p class="hint">Override the default server URL for this provider.</p>
+  </div>
+
   <div class="field">
     <label for="model">Model</label>
     <select id="model"></select>
+    <input type="text" id="modelCustom" placeholder="Model name (e.g. llama3)" style="display:none;margin-top:4px">
   </div>
 
   <div class="field">
@@ -286,18 +314,60 @@ export class SettingsPanel {
         { id: 'gpt-4o-mini', name: 'GPT-4o mini (faster)' },
         { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
       ],
+      mistral: [
+        { id: 'codestral-latest', name: 'Codestral (best for code)' },
+        { id: 'mistral-large-latest', name: 'Mistral Large' },
+        { id: 'mistral-small-latest', name: 'Mistral Small' },
+      ],
+      deepseek: [
+        { id: 'deepseek-chat', name: 'DeepSeek Chat (recommended)' },
+        { id: 'deepseek-coder', name: 'DeepSeek Coder' },
+      ],
+      moonshot: [
+        { id: 'moonshot-v1-32k', name: 'Moonshot v1 32k (recommended)' },
+        { id: 'moonshot-v1-8k', name: 'Moonshot v1 8k' },
+        { id: 'moonshot-v1-128k', name: 'Moonshot v1 128k' },
+      ],
+      kimi: [
+        { id: 'moonshot-v1-32k', name: 'Kimi 32k (recommended)' },
+        { id: 'moonshot-v1-8k', name: 'Kimi 8k' },
+        { id: 'moonshot-v1-128k', name: 'Kimi 128k' },
+      ],
+      qwen: [
+        { id: 'qwen-max', name: 'Qwen Max (recommended)' },
+        { id: 'qwen-plus', name: 'Qwen Plus' },
+        { id: 'qwen-turbo', name: 'Qwen Turbo' },
+        { id: 'qwen-coder-plus', name: 'Qwen Coder Plus' },
+      ],
+      minimax: [
+        { id: 'abab6.5s-chat', name: 'MiniMax abab6.5s (recommended)' },
+        { id: 'abab5.5-chat', name: 'MiniMax abab5.5' },
+      ],
       ollama: [
         { id: 'llama3.2', name: 'Llama 3.2' },
         { id: 'mistral', name: 'Mistral' },
         { id: 'qwen2.5-coder', name: 'Qwen 2.5 Coder' },
         { id: 'deepseek-r1', name: 'DeepSeek R1' },
       ],
+      lmstudio: [
+        { id: 'local-model', name: 'Loaded model (use Detect to refresh)' },
+      ],
+      jan: [
+        { id: 'local-model', name: 'Loaded model (use Detect to refresh)' },
+      ],
+      'openai-compatible': [],
     };
+
+    const LOCAL_PROVIDERS = new Set(['ollama', 'lmstudio', 'jan', 'openai-compatible']);
+    const NO_KEY_PROVIDERS = new Set(['ollama', 'lmstudio', 'jan']);
 
     const providerEl = document.getElementById('provider');
     const apiKeyField = document.getElementById('apiKeyField');
+    const baseUrlField = document.getElementById('baseUrlField');
+    const baseUrlEl = document.getElementById('baseUrl');
     const apiKeyEl = document.getElementById('apiKey');
     const modelEl = document.getElementById('model');
+    const modelCustomEl = document.getElementById('modelCustom');
     const tempEl = document.getElementById('temperature');
     const tempLabel = document.getElementById('tempLabel');
     const statusEl = document.getElementById('status');
@@ -308,6 +378,9 @@ export class SettingsPanel {
 
     function populateModels(provider, selected) {
       const list = MODELS[provider] || [];
+      const isCustom = provider === 'openai-compatible';
+      modelEl.style.display = isCustom ? 'none' : '';
+      modelCustomEl.style.display = isCustom ? '' : 'none';
       modelEl.innerHTML = '';
       for (const m of list) {
         const opt = document.createElement('option');
@@ -316,10 +389,23 @@ export class SettingsPanel {
         if (m.id === selected) opt.selected = true;
         modelEl.appendChild(opt);
       }
+      if (!isCustom && selected && !modelEl.value) {
+        // Saved model not in list — add it so it isn't lost
+        const opt = document.createElement('option');
+        opt.value = selected;
+        opt.textContent = selected;
+        opt.selected = true;
+        modelEl.appendChild(opt);
+      }
+      if (isCustom && selected) {
+        modelCustomEl.value = selected;
+      }
     }
 
-    function syncApiKeyVisibility() {
-      apiKeyField.style.display = providerEl.value === 'ollama' ? 'none' : '';
+    function syncFieldVisibility() {
+      const p = providerEl.value;
+      apiKeyField.style.display = NO_KEY_PROVIDERS.has(p) ? 'none' : '';
+      baseUrlField.style.display = LOCAL_PROVIDERS.has(p) ? '' : 'none';
     }
 
     // ── List rendering helpers ──────────────────────────────────────────────
@@ -386,7 +472,7 @@ export class SettingsPanel {
     // ── Provider / model ───────────────────────────────────────────────────
     providerEl.addEventListener('change', () => {
       populateModels(providerEl.value, '');
-      syncApiKeyVisibility();
+      syncFieldVisibility();
       apiKeyEl.value = '';
       apiKeyEl.placeholder = 'Paste your API key here…';
     });
@@ -395,6 +481,10 @@ export class SettingsPanel {
       tempLabel.textContent = parseFloat(tempEl.value).toFixed(2);
     });
 
+    function getModelValue() {
+      return providerEl.value === 'openai-compatible' ? modelCustomEl.value : modelEl.value;
+    }
+
     document.getElementById('save').addEventListener('click', () => {
       statusEl.textContent = '';
       statusEl.className = '';
@@ -402,8 +492,9 @@ export class SettingsPanel {
         command: 'saveSettings',
         provider: providerEl.value,
         apiKey: apiKeyEl.value,
-        model: modelEl.value,
+        model: getModelValue(),
         temperature: parseFloat(tempEl.value),
+        customBaseUrl: baseUrlEl.value.trim(),
       });
     });
 
@@ -414,6 +505,7 @@ export class SettingsPanel {
         command: 'testConnection',
         provider: providerEl.value,
         apiKey: apiKeyEl.value || null,
+        customBaseUrl: baseUrlEl.value.trim() || null,
       });
     });
 
@@ -424,10 +516,13 @@ export class SettingsPanel {
         tempEl.value = String(msg.temperature);
         tempLabel.textContent = parseFloat(msg.temperature).toFixed(2);
         populateModels(msg.provider, msg.model);
-        syncApiKeyVisibility();
+        syncFieldVisibility();
         if (msg.hasApiKey) {
           apiKeyEl.value = '';
           apiKeyEl.placeholder = '(key saved — paste to replace)';
+        }
+        if (msg.customBaseUrl) {
+          baseUrlEl.value = msg.customBaseUrl;
         }
         blockedCommands = msg.blockedCommands || [];
         allowedWriteDirectories = msg.allowedWriteDirectories || [];
@@ -436,6 +531,17 @@ export class SettingsPanel {
       } else if (msg.command === 'testResult') {
         statusEl.textContent = msg.ok ? '✓ Connection successful!' : '✗ ' + (msg.error || 'Unknown error');
         statusEl.className = msg.ok ? 'ok' : 'err';
+      } else if (msg.command === 'detectedModels') {
+        const list = msg.models || [];
+        modelEl.innerHTML = '';
+        for (const m of list) {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.name;
+          modelEl.appendChild(opt);
+        }
+        statusEl.textContent = list.length ? '✓ Found ' + list.length + ' model(s).' : '⚠ No models found.';
+        statusEl.className = list.length ? 'ok' : 'err';
       }
     });
 

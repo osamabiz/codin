@@ -29,8 +29,8 @@ export class OnboardingPanel implements vscode.Disposable {
     }
 
     const panel = vscode.window.createWebviewPanel(
-      'agentPlugin.onboarding',
-      'Welcome to AI Coding Agent',
+      'codin.onboarding',
+      'Welcome to Codin',
       vscode.ViewColumn.One,
       { enableScripts: true, localResourceRoots: [extensionUri] }
     );
@@ -79,12 +79,12 @@ export class OnboardingPanel implements vscode.Disposable {
         if (apiKey) {
           await this._settings.setApiKey(provider, apiKey);
           configureProvider(provider, apiKey);
-          const cfg = vscode.workspace.getConfiguration('agentPlugin');
+          const cfg = vscode.workspace.getConfiguration('codin');
           await cfg.update('provider', provider, vscode.ConfigurationTarget.Global);
         }
         await this._context.globalState.update('onboardingComplete', true);
         this.dispose();
-        void vscode.commands.executeCommand('agentPlugin.openChat');
+        void vscode.commands.executeCommand('codin.openChat');
         break;
       }
     }
@@ -101,7 +101,7 @@ export class OnboardingPanel implements vscode.Disposable {
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'none'; script-src 'nonce-${nonce}'; style-src ${csp} 'unsafe-inline';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to AI Coding Agent</title>
+  <title>Welcome to Codin</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body {
@@ -160,7 +160,7 @@ export class OnboardingPanel implements vscode.Disposable {
   </style>
 </head>
 <body>
-  <h1>Welcome to AI Coding Agent</h1>
+  <h1>Welcome to Codin</h1>
   <p class="subtitle">Connect your LLM provider to get started. Your key is stored securely in VS Code — never sent anywhere except your chosen provider.</p>
 
   <div class="field">

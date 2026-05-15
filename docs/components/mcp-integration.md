@@ -118,7 +118,7 @@ class MCPManager {
 
 ## Settings integration
 
-MCP servers are configured in the settings page under the "MCP servers" section (see `docs/pages/settings.md`). They are persisted in `workspace.getConfiguration('agentPlugin.mcpServers')` as an array of `MCPServerConfig` objects.
+MCP servers are configured in the settings page under the "MCP servers" section (see `docs/pages/settings.md`). They are persisted in `workspace.getConfiguration('codin.mcpServers')` as an array of `MCPServerConfig` objects.
 
 ## Popular MCP servers users can add
 

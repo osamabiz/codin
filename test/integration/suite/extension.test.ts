@@ -12,11 +12,11 @@ suite('Extension activation', () => {
   test('all commands are registered', async () => {
     const commands = await vscode.commands.getCommands();
     const expected = [
-      'agentPlugin.openChat',
-      'agentPlugin.newChat',
-      'agentPlugin.openSettings',
-      'agentPlugin.stopAgent',
-      'agentPlugin.toggleDryRun',
+      'codin.openChat',
+      'codin.newChat',
+      'codin.openSettings',
+      'codin.stopAgent',
+      'codin.toggleDryRun',
     ];
     for (const cmd of expected) {
       assert.ok(commands.includes(cmd), `Missing command: ${cmd}`);
@@ -24,7 +24,7 @@ suite('Extension activation', () => {
   });
 
   test('status bar item is visible after opening chat', async () => {
-    await vscode.commands.executeCommand('agentPlugin.openChat');
+    await vscode.commands.executeCommand('codin.openChat');
     // Give webview time to load
     await new Promise<void>((r) => setTimeout(r, 1000));
     // If command did not throw, status bar was created successfully

@@ -36,11 +36,11 @@ VS Code unloads extension (window close, disable, reload)
 
 | Command ID | Title | Handler |
 |---|---|---|
-| `agentPlugin.openChat` | Agent: Open Chat | Opens / focuses ChatPanel |
-| `agentPlugin.newChat` | Agent: New Chat | Clears history, opens fresh ChatPanel |
-| `agentPlugin.openSettings` | Agent: Settings | Opens SettingsPanel |
-| `agentPlugin.stopAgent` | Agent: Stop | Calls `agent.stop()` |
-| `agentPlugin.toggleDryRun` | Agent: Toggle Dry Run | Flips dry-run mode |
+| `codin.openChat` | Agent: Open Chat | Opens / focuses ChatPanel |
+| `codin.newChat` | Agent: New Chat | Clears history, opens fresh ChatPanel |
+| `codin.openSettings` | Agent: Settings | Opens SettingsPanel |
+| `codin.stopAgent` | Agent: Stop | Calls `agent.stop()` |
+| `codin.toggleDryRun` | Agent: Toggle Dry Run | Flips dry-run mode |
 
 ---
 
@@ -49,7 +49,7 @@ VS Code unloads extension (window close, disable, reload)
 ```typescript
 export async function activate(context: vscode.ExtensionContext) {
   // 1. Logger
-  const logger = new Logger('AI Agent');
+  const logger = new Logger('Codin');
 
   // 2. Settings
   const settings = new SettingsManager(context.secrets, context.globalState);
@@ -75,24 +75,24 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // 7. Register sidebar
   context.subscriptions.push(
-    vscode.window.registerTreeDataProvider('agentPlugin.sidebar', sidebarProvider)
+    vscode.window.registerTreeDataProvider('codin.sidebar', sidebarProvider)
   );
 
   // 8. Register commands
   context.subscriptions.push(
-    vscode.commands.registerCommand('agentPlugin.openChat', () => {
+    vscode.commands.registerCommand('codin.openChat', () => {
       ChatPanel.createOrShow(context.extensionUri, agent, settings);
     }),
-    vscode.commands.registerCommand('agentPlugin.newChat', () => {
+    vscode.commands.registerCommand('codin.newChat', () => {
       ChatPanel.reset(context.extensionUri, agent, settings);
     }),
-    vscode.commands.registerCommand('agentPlugin.openSettings', () => {
+    vscode.commands.registerCommand('codin.openSettings', () => {
       SettingsPanel.createOrShow(context.extensionUri, settings);
     }),
-    vscode.commands.registerCommand('agentPlugin.stopAgent', () => {
+    vscode.commands.registerCommand('codin.stopAgent', () => {
       agent.stop();
     }),
-    vscode.commands.registerCommand('agentPlugin.toggleDryRun', () => {
+    vscode.commands.registerCommand('codin.toggleDryRun', () => {
       settings.dryRun = !settings.dryRun;
       statusBar.update(agent.state);
     })
@@ -116,7 +116,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
   }
 
-  logger.info('AI Agent extension activated');
+  logger.info('Codin extension activated');
 }
 
 export function deactivate() {
@@ -141,7 +141,7 @@ class SettingsManager {
   async getApiKey(provider: string): Promise<string | undefined>
   async setApiKey(provider: string, key: string): Promise<void>
 
-  // Config — workspace.getConfiguration('agentPlugin')
+  // Config — workspace.getConfiguration('codin')
   get provider(): string
   get model(): string
   get maxSteps(): number

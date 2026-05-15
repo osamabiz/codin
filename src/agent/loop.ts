@@ -3,6 +3,46 @@ import type { ITool, ToolContext } from '../tools/types';
 import type { AgentContext, AgentEvent, AgentOptions, PlanStep, ToolCall, ToolResult } from './types';
 import type { AgentMemory } from './memory';
 
+// ── Text-fallback helpers ─────────────────────────────────────────────────────
+// Used when provider.supportsToolUse is false. Tools are described in the
+// system prompt and the LLM responds with JSON blocks that we parse back out.
+
+function buildTextFallbackPrompt(tools: ITool[]): string {
+  const descriptions = tools
+    .map((t) => `- ${t.name}: ${t.description}\n  Parameters: ${JSON.stringify(t.parameters)}`)
+    .join('\n');
+  return `\n\n[TOOL USE — TEXT MODE]
+This model does not support native function calling. To call a tool, include a fenced JSON block:
+\`\`\`tool_call
+{"tool": "tool_name", "input": {"param": "value"}}
+\`\`\`
+Call one tool at a time. Wait for the result before calling another.
+
+Available tools:
+${descriptions}`;
+}
+
+function parseTextToolCalls(text: string, tools: ITool[]): ToolCall[] {
+  const calls: ToolCall[] = [];
+  const fence = /```tool_call\s*\n([\s\S]*?)```/g;
+  let m: RegExpExecArray | null;
+  while ((m = fence.exec(text)) !== null) {
+    try {
+      const obj = JSON.parse(m[1]) as { tool?: string; input?: unknown };
+      if (!obj.tool) continue;
+      if (!tools.find((t) => t.name === obj.tool)) continue;
+      calls.push({
+        id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name: obj.tool,
+        input: obj.input ?? {},
+      });
+    } catch {
+      // malformed JSON block — skip
+    }
+  }
+  return calls;
+}
+
 const MAX_OUTPUT_CHARS = 4000;
 
 const SYSTEM_PROMPT = `You are an expert coding agent embedded in VS Code. Your job is to complete the user's task by reasoning step by step and using the tools available.
@@ -94,12 +134,16 @@ export async function* runLoop(
       }
     }
 
+    const textMode = !provider.supportsToolUse;
+
     const chatOptions: ChatOptions = {
       model: context.model,
       maxTokens: context.maxTokens,
       temperature: context.temperature,
       tools: toolDefs,
-      systemPrompt: buildSystemPrompt(memory),
+      systemPrompt:
+        buildSystemPrompt(memory) +
+        (textMode ? buildTextFallbackPrompt(tools) : ''),
     };
 
     // Emit step_start for the current plan step
@@ -132,6 +176,12 @@ export async function* runLoop(
 
     if (checkStopped()) return;
 
+    // In text-fallback mode, parse tool calls embedded in the response text
+    if (textMode && pendingCalls.length === 0) {
+      const parsed = parseTextToolCalls(finalText, tools);
+      pendingCalls.push(...parsed);
+    }
+
     if (pendingCalls.length === 0) {
       // Pure text response — agent is done
       if (planSteps && planStepIndex < planSteps.length) {
@@ -145,13 +195,17 @@ export async function* runLoop(
     // Suppress unused-variable warning; hasText is used to guard streaming logic upstream
     void hasText;
 
-    // Record assistant message containing text + tool_use blocks
-    const assistantContent: ContentBlock[] = [];
-    if (finalText) assistantContent.push({ type: 'text', text: finalText });
-    for (const call of pendingCalls) {
-      assistantContent.push({ type: 'tool_use', id: call.id, name: call.name, input: call.input });
+    // Record assistant message: plain string in text-fallback mode, ContentBlock[] otherwise
+    if (textMode) {
+      memory.append({ role: 'assistant', content: finalText });
+    } else {
+      const assistantContent: ContentBlock[] = [];
+      if (finalText) assistantContent.push({ type: 'text', text: finalText });
+      for (const call of pendingCalls) {
+        assistantContent.push({ type: 'tool_use', id: call.id, name: call.name, input: call.input });
+      }
+      memory.append({ role: 'assistant', content: assistantContent });
     }
-    memory.append({ role: 'assistant', content: assistantContent });
 
     // Execute each tool call
     for (const call of pendingCalls) {

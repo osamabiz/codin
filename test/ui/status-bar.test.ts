@@ -26,7 +26,7 @@ describe('StatusBar', () => {
       vscode.StatusBarAlignment.Left,
       100
     );
-    expect(mockItem.command).toBe('agentPlugin.openChat');
+    expect(mockItem.command).toBe('codin.openChat');
     expect(mockItem.show).toHaveBeenCalled();
   });
 

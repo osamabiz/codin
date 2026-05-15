@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-const SECRET_KEY_PREFIX = 'agentPlugin.apiKey.';
+const SECRET_KEY_PREFIX = 'codin.apiKey.';
 
 export class SettingsManager {
   constructor(private readonly _secrets: vscode.SecretStorage) {}
@@ -33,7 +33,11 @@ export class SettingsManager {
     return this._cfg().get<number>('maxSteps', 25);
   }
 
+  getBaseUrl(): string {
+    return this._cfg().get<string>('customBaseUrl', '');
+  }
+
   private _cfg(): vscode.WorkspaceConfiguration {
-    return vscode.workspace.getConfiguration('agentPlugin');
+    return vscode.workspace.getConfiguration('codin');
   }
 }

@@ -81,7 +81,7 @@ body:
     attributes:
       label: Relevant logs
       description: |
-        Open the Output panel (View → Output), select **AI Agent** in the dropdown, and paste relevant lines here.
+        Open the Output panel (View → Output), select **Codin** in the dropdown, and paste relevant lines here.
       render: text
 
   - type: checkboxes

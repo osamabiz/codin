@@ -145,13 +145,13 @@ See `docs/components/mcp-integration.md` for the MCP spec.
 
 ## VS Code native settings (package.json contributes.configuration)
 
-All settings are also editable via VS Code's Settings UI and `settings.json` under the namespace `agentPlugin.*`, e.g.:
+All settings are also editable via VS Code's Settings UI and `settings.json` under the namespace `codin.*`, e.g.:
 
 ```json
 {
-  "agentPlugin.provider": "claude",
-  "agentPlugin.model": "claude-sonnet-4",
-  "agentPlugin.maxSteps": 25,
-  "agentPlugin.autoApproveReadOnly": true
+  "codin.provider": "claude",
+  "codin.model": "claude-sonnet-4",
+  "codin.maxSteps": 25,
+  "codin.autoApproveReadOnly": true
 }
 ```

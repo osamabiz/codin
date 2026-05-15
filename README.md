@@ -1,4 +1,4 @@
-# AI Coding Agent
+# Codin
 
 [![CI](https://github.com/open-source/vscode-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/open-source/vscode-agent/actions/workflows/ci.yml)
 [![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/open-source.vscode-agent?label=marketplace)](https://marketplace.visualstudio.com/items?itemName=open-source.vscode-agent)
@@ -26,7 +26,7 @@
 
 ### 1. Install
 
-Search **AI Coding Agent** in the VS Code Extensions panel, or install from the Marketplace:
+Search **Codin** in the VS Code Extensions panel, or install from the Marketplace:
 
 ```
 ext install open-source.vscode-agent
@@ -73,20 +73,20 @@ The agent will plan the work, show you each file edit as a diff, and ask for app
 
 ## Configuration
 
-All settings are under the `agentPlugin.*` namespace, editable via **Agent: Open Settings** or VS Code's native Settings UI.
+All settings are under the `codin.*` namespace, editable via **Agent: Open Settings** or VS Code's native Settings UI.
 
 | Setting | Default | Description |
 |---|---|---|
-| `agentPlugin.provider` | `claude` | Active LLM provider |
-| `agentPlugin.model` | `claude-sonnet-4` | Model ID for the selected provider |
-| `agentPlugin.maxSteps` | `25` | Steps before the agent pauses to ask permission |
-| `agentPlugin.maxRetries` | `3` | Re-plan attempts after a tool failure |
-| `agentPlugin.autoApproveReadOnly` | `false` | Skip confirmation for read-only tools |
-| `agentPlugin.checkpointBeforeEdit` | `false` | Auto git-commit before any write/delete |
-| `agentPlugin.temperature` | `0.7` | LLM temperature (0 = deterministic) |
-| `agentPlugin.maxTokens` | `4096` | Max tokens per LLM response |
-| `agentPlugin.blockedCommands` | `["rm -rf /", "sudo"]` | Shell patterns the agent may not run |
-| `agentPlugin.allowedWriteDirectories` | `[]` | Restrict writes to these paths (empty = whole workspace) |
+| `codin.provider` | `claude` | Active LLM provider |
+| `codin.model` | `claude-sonnet-4` | Model ID for the selected provider |
+| `codin.maxSteps` | `25` | Steps before the agent pauses to ask permission |
+| `codin.maxRetries` | `3` | Re-plan attempts after a tool failure |
+| `codin.autoApproveReadOnly` | `false` | Skip confirmation for read-only tools |
+| `codin.checkpointBeforeEdit` | `false` | Auto git-commit before any write/delete |
+| `codin.temperature` | `0.7` | LLM temperature (0 = deterministic) |
+| `codin.maxTokens` | `4096` | Max tokens per LLM response |
+| `codin.blockedCommands` | `["rm -rf /", "sudo"]` | Shell patterns the agent may not run |
+| `codin.allowedWriteDirectories` | `[]` | Restrict writes to these paths (empty = whole workspace) |
 
 Full details: [docs/pages/settings.md](docs/pages/settings.md)
 

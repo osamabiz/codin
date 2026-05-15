@@ -34,7 +34,7 @@ export const writeFile: ITool = {
 
     // Check allowedWriteDirectories setting
     const allowed = context.vscode.workspace
-      .getConfiguration('agentPlugin')
+      .getConfiguration('codin')
       .get<string[]>('allowedWriteDirectories', []);
     if (allowed.length > 0) {
       const inAllowed = allowed.some((dir) => {
@@ -48,7 +48,7 @@ export const writeFile: ITool = {
 
     // Optional checkpoint before edit
     const checkpoint = context.vscode.workspace
-      .getConfiguration('agentPlugin')
+      .getConfiguration('codin')
       .get<boolean>('checkpointBeforeEdit', false);
     if (checkpoint === true) {
       try {

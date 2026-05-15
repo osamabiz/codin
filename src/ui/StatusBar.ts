@@ -10,8 +10,8 @@ export class StatusBar implements vscode.Disposable {
       vscode.StatusBarAlignment.Left,
       100
     );
-    this._item.command = 'agentPlugin.openChat';
-    this._item.tooltip = 'AI Agent — click to open chat';
+    this._item.command = 'codin.openChat';
+    this._item.tooltip = 'Codin — click to open chat';
     this._setState('idle');
     this._item.show();
   }

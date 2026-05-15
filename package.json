@@ -1,7 +1,7 @@
 {
-  "name": "vscode-agent",
-  "displayName": "AI Coding Agent",
-  "description": "Open-source VS Code agent powered by your own Claude, OpenAI, or Gemini subscription. Plans, writes, edits, and tests code autonomously. Free forever.",
+  "name": "codin",
+  "displayName": "Codin",
+  "description": "Your AI coding agent, powered by your own subscription",
   "version": "0.1.0",
   "publisher": "open-source",
   "license": "MIT",
@@ -15,114 +15,131 @@
   "contributes": {
     "commands": [
       {
-        "command": "agentPlugin.openChat",
-        "title": "Agent: Open Chat"
+        "command": "codin.openChat",
+        "title": "Codin: Open Chat"
       },
       {
-        "command": "agentPlugin.openSettings",
-        "title": "Agent: Open Settings"
+        "command": "codin.openSettings",
+        "title": "Codin: Open Settings"
       },
       {
-        "command": "agentPlugin.newChat",
-        "title": "Agent: New Chat"
+        "command": "codin.newChat",
+        "title": "Codin: New Chat"
       },
       {
-        "command": "agentPlugin.stopAgent",
-        "title": "Agent: Stop"
+        "command": "codin.stopAgent",
+        "title": "Codin: Stop"
       },
       {
-        "command": "agentPlugin.toggleDryRun",
-        "title": "Agent: Toggle Dry Run"
+        "command": "codin.toggleDryRun",
+        "title": "Codin: Toggle Dry Run"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "agentPlugin",
-          "title": "AI Agent",
+          "id": "codin",
+          "title": "Codin",
           "icon": "media/robot.svg"
         }
       ]
     },
     "views": {
-      "agentPlugin": [
+      "codin": [
         {
-          "id": "agentPlugin.sidebar",
+          "id": "codin.sidebar",
           "name": "Agent"
         }
       ]
     },
     "keybindings": [
       {
-        "command": "agentPlugin.openChat",
+        "command": "codin.openChat",
         "key": "ctrl+shift+alt+a",
         "mac": "cmd+shift+alt+a"
       }
     ],
     "configuration": {
-      "title": "AI Coding Agent",
+      "title": "Codin",
       "properties": {
-        "agentPlugin.provider": {
+        "codin.provider": {
           "type": "string",
           "default": "claude",
-          "enum": ["claude", "openai", "gemini", "ollama"],
+          "enum": [
+            "claude", "openai", "mistral", "deepseek",
+            "moonshot", "kimi", "qwen", "minimax",
+            "ollama", "lmstudio", "jan", "openai-compatible"
+          ],
           "enumDescriptions": [
             "Anthropic Claude (recommended)",
             "OpenAI GPT models",
-            "Google Gemini",
-            "Local Ollama (no API key required)"
+            "Mistral AI",
+            "DeepSeek",
+            "Moonshot AI",
+            "Kimi (Moonshot AI)",
+            "Qwen (Alibaba Cloud)",
+            "MiniMax",
+            "Local Ollama (no API key required)",
+            "LM Studio (local, no API key required)",
+            "Jan.ai (local, no API key required)",
+            "Custom OpenAI-compatible endpoint"
           ],
           "description": "LLM provider to use for the agent."
         },
-        "agentPlugin.model": {
+        "codin.customBaseUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Override base URL for local or custom providers (e.g. http://localhost:1234/v1)."
+        },
+        "codin.model": {
           "type": "string",
           "default": "claude-sonnet-4",
           "description": "Model to use with the selected provider."
         },
-        "agentPlugin.maxSteps": {
+        "codin.maxSteps": {
           "type": "number",
           "default": 25,
           "minimum": 1,
           "maximum": 100,
           "description": "Maximum steps the agent can take before pausing to ask for confirmation."
         },
-        "agentPlugin.maxRetries": {
+        "codin.maxRetries": {
           "type": "number",
           "default": 3,
           "minimum": 0,
           "maximum": 10,
           "description": "How many times the agent re-plans after a tool failure."
         },
-        "agentPlugin.autoApproveReadOnly": {
+        "codin.autoApproveReadOnly": {
           "type": "boolean",
           "default": false,
           "description": "Automatically approve read-only tool calls (read_file, grep_codebase, git_status) without showing a confirmation card."
         },
-        "agentPlugin.checkpointBeforeEdit": {
+        "codin.checkpointBeforeEdit": {
           "type": "boolean",
           "default": false,
           "description": "Create a git commit before any write_file or delete_file operation to provide a rollback point."
         },
-        "agentPlugin.blockedCommands": {
+        "codin.blockedCommands": {
           "type": "array",
           "items": { "type": "string" },
           "default": ["rm -rf /", "sudo"],
           "description": "Shell command patterns the agent is not allowed to run."
         },
-        "agentPlugin.allowedWriteDirectories": {
+        "codin.allowedWriteDirectories": {
           "type": "array",
           "items": { "type": "string" },
           "default": [],
           "description": "Restrict file writes to these paths (relative to workspace root). Empty = entire workspace allowed."
         },
-        "agentPlugin.temperature": {
+        "codin.temperature": {
           "type": "number",
           "default": 0.7,
           "minimum": 0,
           "maximum": 1,
           "description": "Temperature (randomness) for LLM responses. 0 = deterministic, 1 = very creative."
         },
-        "agentPlugin.maxTokens": {
+        "codin.maxTokens": {
           "type": "number",
           "default": 4096,
           "minimum": 256,

@@ -20,10 +20,10 @@ export async function launchVSCode(options: LaunchOptions = {}): Promise<{ page:
   await fs.writeFile(
     path.join(vscodeDotDir, 'settings.json'),
     JSON.stringify({
-      'agentPlugin.provider': 'claude',
-      'agentPlugin.model': 'claude-sonnet-4-5',
+      'codin.provider': 'claude',
+      'codin.model': 'claude-sonnet-4-5',
       // Point to mock server via custom base URL (extension must support this)
-      'agentPlugin.customBaseUrl': MOCK_LLM_URL,
+      'codin.customBaseUrl': MOCK_LLM_URL,
     }),
     'utf-8'
   );

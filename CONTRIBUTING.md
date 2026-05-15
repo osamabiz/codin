@@ -1,4 +1,4 @@
-# Contributing to AI Coding Agent
+# Contributing to Codin
 
 Thanks for your interest in contributing! This guide walks you from a fresh clone to a merged pull request.
 
@@ -167,7 +167,7 @@ Add it to `PROVIDERS` and the `configure` / `get` switch statements.
 
 ### 3. Add to `package.json`
 
-In `contributes.configuration.properties.agentPlugin.provider.enum`, add `"mistral"` and a description.
+In `contributes.configuration.properties.codin.provider.enum`, add `"mistral"` and a description.
 
 ### 4. Document it
 

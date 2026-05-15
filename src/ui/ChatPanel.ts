@@ -74,8 +74,8 @@ export class ChatPanel {
     }
 
     const panel = vscode.window.createWebviewPanel(
-      'agentPlugin.chatPanel',
-      'AI Agent',
+      'codin.chatPanel',
+      'Codin',
       column ?? vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -180,7 +180,7 @@ export class ChatPanel {
         if (msg.text?.trim()) await this._handleSend(msg.text.trim(), msg.contextItems ?? []);
         break;
       case 'openSettings':
-        void vscode.commands.executeCommand('agentPlugin.openSettings');
+        void vscode.commands.executeCommand('codin.openSettings');
         break;
       case 'cancelStream':
       case 'stopAgent':
@@ -396,7 +396,8 @@ export class ChatPanel {
 
     const providerId = this._settings.getProvider();
     const apiKey = await this._settings.getApiKey(providerId);
-    configureProvider(providerId, apiKey);
+    const baseUrl = this._settings.getBaseUrl();
+    configureProvider(providerId, apiKey, baseUrl);
 
     const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '';
 
@@ -426,13 +427,13 @@ export class ChatPanel {
     const provider = getProvider(providerId);
 
     const agentOptions = {
-      maxSteps: vscode.workspace.getConfiguration('agentPlugin').get<number>('maxSteps', 25),
-      maxRetries: vscode.workspace.getConfiguration('agentPlugin').get<number>('maxRetries', 3),
+      maxSteps: vscode.workspace.getConfiguration('codin').get<number>('maxSteps', 25),
+      maxRetries: vscode.workspace.getConfiguration('codin').get<number>('maxRetries', 3),
       autoApproveReadOnly: vscode.workspace
-        .getConfiguration('agentPlugin')
+        .getConfiguration('codin')
         .get<boolean>('autoApproveReadOnly', false),
       checkpointBeforeEdit: vscode.workspace
-        .getConfiguration('agentPlugin')
+        .getConfiguration('codin')
         .get<boolean>('checkpointBeforeEdit', false),
       dryRun: this._dryRun,
     };
@@ -643,7 +644,7 @@ export class ChatPanel {
              style-src ${cspSource} 'unsafe-inline';
              img-src ${cspSource} data: https:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Agent</title>
+  <title>Codin</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
 
@@ -977,7 +978,7 @@ export class ChatPanel {
 <body>
 <div id="app">
   <div id="topbar">
-    <span>AI Agent</span>
+    <span>Codin</span>
     <div class="topbar-actions">
       <button id="dryRunBtn" title="Toggle dry-run mode (preview without executing)">Dry Run</button>
       <button id="settingsBtn" title="Open Settings">&#9881;</button>

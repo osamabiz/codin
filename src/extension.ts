@@ -9,7 +9,7 @@ import { SettingsManager } from './utils/SettingsManager';
 import { configureProvider } from './providers';
 
 export function activate(context: vscode.ExtensionContext): void {
-  const logger = new Logger('AI Agent');
+  const logger = new Logger('Codin');
   const settings = new SettingsManager(context.secrets);
   const sidebar = new SidebarProvider();
   const statusBar = new StatusBar();
@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   })();
 
-  const treeView = vscode.window.createTreeView('agentPlugin.sidebar', {
+  const treeView = vscode.window.createTreeView('codin.sidebar', {
     treeDataProvider: sidebar,
     showCollapseAll: false,
   });
@@ -37,28 +37,28 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     treeView,
 
-    vscode.commands.registerCommand('agentPlugin.openChat', () => {
+    vscode.commands.registerCommand('codin.openChat', () => {
       ChatPanel.createOrShow(context.extensionUri, settings, sidebar, statusBar);
     }),
 
-    vscode.commands.registerCommand('agentPlugin.openSettings', () => {
+    vscode.commands.registerCommand('codin.openSettings', () => {
       SettingsPanel.createOrShow(context.extensionUri, settings);
     }),
 
-    vscode.commands.registerCommand('agentPlugin.newChat', () => {
+    vscode.commands.registerCommand('codin.newChat', () => {
       ChatPanel.newChat(context.extensionUri, settings, sidebar, statusBar);
     }),
 
-    vscode.commands.registerCommand('agentPlugin.stopAgent', () => {
+    vscode.commands.registerCommand('codin.stopAgent', () => {
       ChatPanel.stopAgent();
     }),
 
-    vscode.commands.registerCommand('agentPlugin.toggleDryRun', () => {
+    vscode.commands.registerCommand('codin.toggleDryRun', () => {
       ChatPanel.toggleDryRun();
     })
   );
 
-  logger.info('AI Agent extension activated');
+  logger.info('Codin extension activated');
 }
 
 export function deactivate(): void {

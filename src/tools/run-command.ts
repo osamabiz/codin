@@ -51,7 +51,7 @@ export const runCommand: ITool = {
 
     // Check blocked commands
     const blockedPatterns = context.vscode.workspace
-      .getConfiguration('agentPlugin')
+      .getConfiguration('codin')
       .get<string[]>('blockedCommands', DEFAULT_BLOCKED);
 
     if (isBlocked(command, blockedPatterns)) {
