@@ -6,51 +6,36 @@ on:
       - 'v*.*.*'
 
 jobs:
-  publish:
-    name: Publish to VS Code Marketplace
+  test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 18
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Unit tests
-        run: npm test
-
-      - name: Build extension
-        run: npm run build
-
-      - name: Install vsce
-        run: npm install -g @vscode/vsce
-
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm run build
+      
       - name: Package extension
-        run: vsce package
-
-      - name: Publish to Marketplace
-        run: vsce publish
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-
-      - name: Upload .vsix artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vscode-agent-${{ github.ref_name }}.vsix
-          path: '*.vsix'
-
+        run: npx @vscode/vsce package
+        
+      - name: Publish to VS Code Marketplace
+        run: npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }}
+        
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
-          files: '*.vsix'
+          files: "*.vsix"
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Before publishing: npx sharp-cli -i images/icon.svg -o images/icon.png resize 512 512 -->
+  <rect width="512" height="512" rx="100" fill="#1e1e2e" />
+  
+  <g transform="translate(140, 180)">
+    <!-- Terminal prompt > -->
+    <path d="M 0 0 L 80 76 L 0 152" fill="none" stroke="#ffffff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Robot/agent accent dot or line -->
+    <path d="M 140 152 L 240 152" fill="none" stroke="#7c6af7" stroke-width="48" stroke-linecap="round" />
+  </g>
+</svg>

@@ -5,6 +5,10 @@
   "version": "0.1.0",
   "publisher": "open-source",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open-source/codin.git"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -12,6 +16,7 @@
     "Other",
     "Machine Learning"
   ],
+  "icon": "images/icon.png",
   "keywords": [
     "ai",
     "agent",

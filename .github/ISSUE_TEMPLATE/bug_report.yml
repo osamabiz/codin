@@ -1,95 +1,65 @@
-name: Bug report
-description: Something is broken or behaving unexpectedly
-labels: ["bug", "needs-triage"]
+name: Bug Report
+description: File a bug report to help us improve Codin
+title: "[Bug]: "
+labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to file a bug! Please fill in as much detail as you can.
-
-  - type: textarea
-    id: description
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: vscode-version
     attributes:
-      label: What happened?
-      description: A clear description of the bug.
-      placeholder: "e.g. The agent wrote a file without showing the diff approval card."
+      label: VS Code Version
+      description: What version of VS Code are you using?
+      placeholder: e.g. 1.85.0
     validations:
       required: true
-
-  - type: textarea
-    id: repro
+  - type: input
+    id: codin-version
     attributes:
-      label: Steps to reproduce
-      description: Minimal steps to reproduce the issue.
-      placeholder: |
-        1. Open chat panel
-        2. Send message "..."
-        3. See error / unexpected behaviour
+      label: Codin Version
+      description: What version of the Codin extension are you using?
+      placeholder: e.g. 0.1.0
     validations:
       required: true
-
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected behaviour
-      placeholder: "e.g. A diff card should appear asking for approval."
-    validations:
-      required: true
-
-  - type: dropdown
+  - type: input
     id: provider
     attributes:
-      label: LLM provider
-      options:
-        - Claude (Anthropic)
-        - OpenAI
-        - Google Gemini
-        - Ollama (local)
-        - Other
+      label: LLM Provider Used
+      description: Which provider were you using when the bug occurred?
+      placeholder: e.g. Claude, OpenAI, Local Ollama, Groq
     validations:
       required: true
-
   - type: input
-    id: extension_version
-    attributes:
-      label: Extension version
-      placeholder: "e.g. 0.1.0 (shown in Extensions panel)"
-    validations:
-      required: true
-
-  - type: input
-    id: vscode_version
-    attributes:
-      label: VS Code version
-      placeholder: "e.g. 1.90.0 — from Help → About"
-    validations:
-      required: true
-
-  - type: dropdown
     id: os
     attributes:
-      label: Operating system
-      options:
-        - Windows
-        - macOS
-        - Linux
+      label: Operating System
+      description: What OS are you running?
+      placeholder: e.g. Windows 11, macOS Sonoma, Ubuntu 22.04
     validations:
       required: true
-
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Open VS Code
+        2. Ask the agent to...
+        3. See error...
+    validations:
+      required: true
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: Expected vs. Actual Behavior
+      description: What did you expect to happen, and what actually happened?
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:
-      label: Relevant logs
-      description: |
-        Open the Output panel (View → Output), select **Codin** in the dropdown, and paste relevant lines here.
+      label: Output Panel Logs
+      description: Please paste the logs from the Output panel (View -> Output -> select Codin from the dropdown).
       render: text
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Checklist
-      options:
-        - label: I searched existing issues and this is not a duplicate
-          required: true
-        - label: I am using the latest version of the extension
-          required: true

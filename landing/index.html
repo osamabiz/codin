@@ -1,0 +1,589 @@
+<!--
+  codin.my — static landing page
+  Deploy: GitHub Pages from /landing folder
+  DNS: point codin.my A record to GitHub Pages IP
+  No build step required — this file is the complete site
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codin — Your AI coding agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: #0d0d14;
+      --surface: #1a1a2e;
+      --border: #2a2a4a;
+      --accent: #7c6af7;
+      --accent-light: #a89cf7;
+      --text: #e8e8f0;
+      --text-muted: #8888aa;
+      --free-badge: #2d4a2d;
+      --free-text: #6fcf6f;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, h5, h6, .mono {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    a {
+      color: var(--accent-light);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    a:hover {
+      color: var(--text);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-light);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(124, 106, 247, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent-light);
+      transform: translateY(-2px);
+    }
+
+    /* Badge */
+    .badge-free {
+      background-color: var(--free-badge);
+      color: var(--free-text);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+
+    /* 1. Nav bar (sticky) */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 13, 20, 0.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-light);
+    }
+
+    /* 2. Hero */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 0%, rgba(124, 106, 247, 0.15) 0%, rgba(13, 13, 20, 1) 70%);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
+
+    .hero-sub {
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .hero-microcopy {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Sections Shared */
+    section {
+      padding: 80px 0;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    /* Cards Shared */
+    .card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .card-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-links a {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* 3. Get started free */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    /* 4. How it works */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+    }
+
+    .step {
+      position: relative;
+    }
+
+    .step-number {
+      font-family: var(--font-mono);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--border);
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+
+    .step h3 {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .step p {
+      color: var(--text-muted);
+    }
+
+    /* 5. Features grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      gap: 20px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+
+    .feature-icon {
+      font-size: 1.75rem;
+      flex-shrink: 0;
+    }
+
+    .feature-content h4 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .feature-content p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* 6. Providers strip */
+    .providers-strip {
+      background-color: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .providers-strip h3 {
+      font-size: 1.5rem;
+      margin-bottom: 32px;
+    }
+
+    .providers-list {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 900px;
+      margin: 0 auto 24px;
+      line-height: 2;
+    }
+
+    .providers-list span {
+      color: var(--text);
+    }
+
+    .providers-caption {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* 7. Footer */
+    footer {
+      padding: 60px 0 40px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-logo {
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-light);
+    }
+
+    .footer-bottom {
+      text-align: left;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero {
+        padding: 60px 0 40px;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Nav bar -->
+  <header>
+    <div class="container nav-inner">
+      <div class="logo mono">Codin</div>
+      <div class="nav-links">
+        <!-- TODO: replace with real GitHub URL -->
+        <a href="#">GitHub</a>
+        <!-- TODO: replace with real Marketplace URL -->
+        <a href="#">Install for VS Code</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Your AI coding agent</h1>
+      <p class="hero-sub">Powered by your own subscription.<br>Free forever. Open source.</p>
+      <div class="hero-ctas">
+        <!-- TODO: replace with real Marketplace URL -->
+        <a href="#" class="btn btn-primary">Install for VS Code →</a>
+        <!-- TODO: replace with real GitHub URL -->
+        <a href="#" class="btn btn-secondary">View on GitHub</a>
+      </div>
+      <p class="hero-microcopy">
+        No Codin subscription needed · Works with Claude, OpenAI, Gemini, Groq, Ollama, and 9 more
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. Get started free -->
+  <section id="get-started">
+    <div class="container">
+      <div class="pricing-grid">
+        <!-- Card 1 -->
+        <div class="card">
+          <div class="card-icon">🖥</div>
+          <h3>Run locally — 100% free</h3>
+          <p>No account. No key. No cost ever. Runs entirely on your machine.</p>
+          <div class="card-links">
+            <a href="https://ollama.com/download" target="_blank" rel="noopener noreferrer">Get Ollama →</a>
+          </div>
+        </div>
+        
+        <!-- Card 2 -->
+        <div class="card">
+          <div class="card-icon">✦</div>
+          <h3>Free cloud API <span class="badge-free">Free Tier</span></h3>
+          <p>Gemini gives you 15 req/min free. Groq gives you ~100 req/min free. No credit card required.</p>
+          <div class="card-links">
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Gemini →</a>
+            <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer">Groq →</a>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card">
+          <div class="card-icon">🔑</div>
+          <h3>Bring your own key</h3>
+          <p>Already paying for Claude or OpenAI? Use that. Codin adds zero cost.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. How it works -->
+  <section id="how-it-works">
+    <div class="container">
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Connect your provider</h3>
+          <p>Pick from 14 providers. Free options included.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Describe your task</h3>
+          <p>"Add JWT auth", "Write tests for this module", "Fix the TypeScript errors in src/"</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Review and approve</h3>
+          <p>See every file change as a diff before it's written. You stay in control.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Features grid -->
+  <section id="features">
+    <div class="container">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🗂</div>
+          <div class="feature-content">
+            <h4>Plans multi-step tasks</h4>
+            <p>Breaks big tasks into steps, executes them one by one.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <div class="feature-content">
+            <h4>Reads and writes files</h4>
+            <p>Proposes diffs you approve before anything changes.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-content">
+            <h4>Runs terminal commands</h4>
+            <p>npm install, tests, builds — with your confirmation.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <div class="feature-content">
+            <h4>Searches your codebase</h4>
+            <p>Grep, file search, language server diagnostics.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <div class="feature-content">
+            <h4>Self-corrects on failure</h4>
+            <p>If a test fails, the agent re-plans and tries again.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📜</div>
+          <div class="feature-content">
+            <h4>Project history</h4>
+            <p>Every task saved per workspace. Pick up where you left off.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Providers strip -->
+  <section class="providers-strip">
+    <div class="container">
+      <h3>Works with 14 providers</h3>
+      <div class="providers-list">
+        <span>Claude</span> · <span>OpenAI</span> · <span>Gemini</span> ✦ · <span>Groq</span> ✦ · <span>OpenRouter</span> ✦ · <span>Mistral</span> · <span>DeepSeek</span> · <span>Kimi</span> · <span>Qwen</span> · <span>MiniMax</span> · <span>Ollama</span> · <span>LM Studio</span> · <span>Jan</span> · <span>Custom</span>
+      </div>
+      <p class="providers-caption">✦ free tier available — no credit card</p>
+    </div>
+  </section>
+
+  <!-- 7. Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-top">
+        <div class="footer-logo mono">Codin — MIT License</div>
+        <div class="footer-links">
+          <!-- TODO: replace with real GitHub URL -->
+          <a href="#">GitHub</a>
+          <!-- TODO: replace with real Marketplace URL -->
+          <a href="#">VS Code Marketplace</a>
+          <a href="#">codin.my</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>Codin is an independent open-source project. Not affiliated with Anthropic, OpenAI, Google, or Microsoft.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

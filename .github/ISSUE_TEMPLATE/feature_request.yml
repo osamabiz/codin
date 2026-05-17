@@ -1,57 +1,35 @@
-name: Feature request
-description: Suggest a new feature or improvement
-labels: ["enhancement", "needs-triage"]
+name: Feature Request
+description: Suggest an idea for Codin
+title: "[Feature]: "
+labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for the idea! Please describe what you'd like to see and why it would be useful.
-
+        Thanks for suggesting a feature for Codin!
   - type: textarea
     id: problem
     attributes:
-      label: What problem does this solve?
-      description: Describe the pain point or use case. "I'm frustrated when…" or "I need to be able to…"
-      placeholder: "e.g. I often need to run the agent on just a specific subdirectory but there's no way to restrict context."
+      label: Problem Description
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm always frustrated when...
     validations:
       required: true
-
   - type: textarea
     id: solution
     attributes:
-      label: Proposed solution
-      description: How would you like this to work? UI mockup, command name, configuration key — whatever helps.
+      label: Proposed Solution
+      description: Describe the solution you'd like.
     validations:
       required: true
-
+  - type: input
+    id: spec
+    attributes:
+      label: Relevant Spec File
+      description: Which spec file in the `docs/` folder do you think would need updating for this feature?
+      placeholder: e.g. docs/components/tools.md
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives considered
-      description: Have you tried any workarounds? Are there other ways this could be designed?
-
-  - type: dropdown
-    id: area
-    attributes:
-      label: Area
-      options:
-        - Agent behaviour (loop, planning, tools)
-        - LLM provider support
-        - UI / chat panel
-        - Settings
-        - Security / safety controls
-        - Performance
-        - Documentation
-        - Other
-    validations:
-      required: true
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Checklist
-      options:
-        - label: I searched existing issues and this is not a duplicate
-          required: true
-        - label: This fits within the project scope (local VS Code extension, no backend)
-          required: true
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.

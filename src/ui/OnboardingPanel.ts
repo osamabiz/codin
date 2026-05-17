@@ -15,7 +15,7 @@ export class OnboardingPanel implements vscode.Disposable {
    * True when onboardingComplete is false AND no API key is stored.
    */
   static async shouldShow(
-    context: vscode.ExtensionContext,
+    _context: vscode.ExtensionContext,
     settings: SettingsManager
   ): Promise<boolean> {
     const hasKey = await settings.hasAnyApiKey();

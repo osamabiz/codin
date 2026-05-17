@@ -1,148 +1,75 @@
 # Codin
 
-[![CI](https://github.com/open-source/vscode-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/open-source/vscode-agent/actions/workflows/ci.yml)
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/open-source.vscode-agent?label=marketplace)](https://marketplace.visualstudio.com/items?itemName=open-source.vscode-agent)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/open-source/codin/release.yml?branch=main&label=CI)](https://github.com/open-source/codin/actions)
+[![Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/open-source.codin.svg)](https://marketplace.visualstudio.com/items?itemName=open-source.codin)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-> Open-source VS Code extension that turns your existing Claude, OpenAI, or Gemini subscription into a fully autonomous coding agent — directly inside VS Code. Free forever, no backend, no telemetry.
+**Your AI coding agent, powered by your own subscription**
 
-<!-- Demo GIF — add docs/demo.gif once recorded (npx vhs demo.tape) -->
+Codin is a free, open-source AI coding assistant for VS Code. It works as an autonomous agent right inside your editor, allowing you to give it high-level tasks. It will plan the steps, search your codebase, write files, and run commands—all while asking for your approval before modifying anything.
 
----
+## Get started free
+
+You choose the AI model that powers Codin. No lock-in, no markups.
+
+| Path | Cost | Setup time |
+|---|---|---|
+| **Ollama (local)** | Free forever | ~5 min |
+| **Gemini free API** | Free (15 req/min) | ~2 min |
+| **Groq free API** | Free (~100 req/min) | ~2 min |
+| **Your API key** | Pay per use (cents) | ~1 min |
 
 ## Features
 
-- **Bring your own key** — connect your existing Claude / OpenAI / Gemini API key, or run fully local with Ollama
-- **Autonomous agent loop** — plans multi-step tasks, reads and edits files, runs terminal commands, and self-corrects on failure
-- **Always asks before writing** — every file edit shows an inline diff; nothing is written or deleted without your approval
-- **Dry-run mode** — preview the full plan without touching a single file
-- **Context mentions** — attach `@file`, `@selection`, or `@symbol` to any message for precise context
-- **Status bar** — glanceable agent state (Idle / Running / Waiting / Error) in the VS Code status bar
-- **Open source** — MIT licensed, no backend, no telemetry, self-hosted or Marketplace
+- **Agent Loop**: Advanced reasoning loop (plan → execute → verify).
+- **10 Built-in Tools**: Read/write files, create/delete files, run terminal commands, grep codebase, list files, git status, git commit, and open a browser.
+- **14 LLM Providers**: Bring your own key for Claude, OpenAI, Gemini, DeepSeek, and more.
+- **Approval System**: Inline diff views to approve or reject every single file edit. 
+- **Dry Run Mode**: See exactly what the agent would do before executing any tools.
+- **Task History**: Conversations and context are saved automatically per project.
 
----
+## Quick Start
 
-## Quick start
+1. **Install** Codin from the VS Code Marketplace.
+2. **Setup Wizard**: Upon first launch, the wizard will guide you through setting up a free local AI, a free cloud API, or your existing API key.
+3. **Start Coding**: Open the Codin sidebar (or click the status bar item), describe your task, and watch it work!
 
-### 1. Install
+## Supported Providers
 
-Search **Codin** in the VS Code Extensions panel, or install from the Marketplace:
+Codin supports 14 different AI providers. Mark free tier paths with a ✦.
 
-```
-ext install open-source.vscode-agent
-```
+| Provider | Models (Examples) |
+|---|---|
+| **Claude (Anthropic)** | Claude 3.5 Sonnet, Opus, Haiku |
+| **OpenAI** | GPT-4o, GPT-4o-mini |
+| **Gemini** ✦ | Gemini 1.5 Pro, Flash |
+| **Groq** ✦ | Llama 3 (ultra fast) |
+| **OpenRouter** ✦ | Llama 3.1 8B (free), Meta, etc. |
+| **Mistral** | Codestral |
+| **DeepSeek** | DeepSeek Coder V2 |
+| **Kimi** | Moonshot |
+| **Qwen** | Qwen Max |
+| **MiniMax** | abab6.5s |
+| **Ollama** | Qwen2.5-Coder, DeepSeek-Coder, Llama 3 |
+| **LM Studio** | Local models |
+| **Jan** | Local models |
+| **Custom** | Any OpenAI-compatible endpoint |
 
-### 2. Open the chat panel
+## How it works
 
-- Command palette → **Agent: Open Chat**
-- Keyboard shortcut: `Ctrl+Shift+Alt+A` (Mac: `Cmd+Shift+Alt+A`)
-- Click the robot icon in the Activity Bar
-
-On first launch, the onboarding wizard guides you through entering your API key.
-
-### 3. Set your API key
-
-1. Open **Agent: Open Settings** (gear icon in the chat panel)
-2. Choose your provider and paste your API key
-3. Click **Test connection** to verify, then **Save**
-
-Your key is stored in VS Code's [SecretStorage](https://code.visualstudio.com/api/references/vscode-api#SecretStorage) — never logged, never synced.
-
-### 4. Give the agent a task
-
-Type a task in the chat panel and press `Enter`:
-
-```
-Add input validation to the login form in src/auth/LoginForm.tsx
-```
-
-The agent will plan the work, show you each file edit as a diff, and ask for approval before writing anything.
-
----
-
-## Supported providers
-
-| Provider | Key required | Recommended model | Notes |
-|---|---|---|---|
-| Claude (Anthropic) | Yes | `claude-sonnet-4-5` | Best tool-use support, recommended |
-| OpenAI | Yes | `gpt-4o` | Full tool-use support |
-| Google Gemini | Yes | `gemini-2.0-flash` | Streaming support |
-| Ollama (local) | No | `llama3.2` | Runs entirely on your machine, no network |
-
----
+1. **Connect your provider**: Use the onboarding wizard to securely store your API key or configure local execution.
+2. **Describe what you want built**: Provide high-level instructions (e.g., "Refactor this component to use React Hooks").
+3. **Review and approve**: Codin plans its approach, searches the necessary files, and presents inline diffs. Approve or reject each change!
 
 ## Configuration
 
-All settings are under the `codin.*` namespace, editable via **Agent: Open Settings** or VS Code's native Settings UI.
-
-| Setting | Default | Description |
-|---|---|---|
-| `codin.provider` | `claude` | Active LLM provider |
-| `codin.model` | `claude-sonnet-4` | Model ID for the selected provider |
-| `codin.maxSteps` | `25` | Steps before the agent pauses to ask permission |
-| `codin.maxRetries` | `3` | Re-plan attempts after a tool failure |
-| `codin.autoApproveReadOnly` | `false` | Skip confirmation for read-only tools |
-| `codin.checkpointBeforeEdit` | `false` | Auto git-commit before any write/delete |
-| `codin.temperature` | `0.7` | LLM temperature (0 = deterministic) |
-| `codin.maxTokens` | `4096` | Max tokens per LLM response |
-| `codin.blockedCommands` | `["rm -rf /", "sudo"]` | Shell patterns the agent may not run |
-| `codin.allowedWriteDirectories` | `[]` | Restrict writes to these paths (empty = whole workspace) |
-
-Full details: [docs/pages/settings.md](docs/pages/settings.md)
-
----
-
-## Commands
-
-| Command | Shortcut | Description |
-|---|---|---|
-| `Agent: Open Chat` | `Ctrl+Shift+Alt+A` | Open the chat panel |
-| `Agent: New Chat` | — | Clear history and start fresh |
-| `Agent: Open Settings` | — | Open the settings panel |
-| `Agent: Stop` | `Escape` (in panel) | Stop the running agent task |
-| `Agent: Toggle Dry Run` | — | Preview mode — no files are modified |
-
----
-
-## Architecture
-
-```
-src/
-├── extension.ts          ← activate / deactivate, command registration
-├── agent/
-│   ├── agent.ts          ← Agent class (run, stop, approve, reject)
-│   ├── loop.ts           ← async generator driving the tool-use loop
-│   ├── planner.ts        ← LLM-based task decomposition
-│   └── memory.ts         ← conversation history + summarization
-├── providers/            ← ILLMProvider implementations (Claude, OpenAI, Ollama)
-├── tools/                ← ITool implementations (read_file, write_file, …)
-├── ui/
-│   ├── ChatPanel.ts      ← main webview panel
-│   ├── SettingsPanel.ts  ← settings webview
-│   ├── SidebarProvider.ts ← activity bar tree view
-│   ├── StatusBar.ts      ← status bar item
-│   └── OnboardingPanel.ts ← first-run wizard
-└── utils/                ← logger, SettingsManager, token counter
-```
-
-Full architecture: [docs/architecture.md](docs/architecture.md)
-
----
+For advanced settings, open the command palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and type **Codin: Open Settings**.
+Read more in our [Settings Documentation](docs/pages/settings.md).
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
-
-- Dev environment setup
-- How to add a new LLM provider
-- How to add a new tool
-- Testing guide
-- PR process
-
-For bugs and feature requests, open a [GitHub Issue](https://github.com/open-source/vscode-agent/issues).
-
----
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to set up the project locally, add new providers, and create PRs.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT License. See [LICENSE](LICENSE) for details.
