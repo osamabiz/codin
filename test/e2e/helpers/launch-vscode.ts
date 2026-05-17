@@ -22,14 +22,17 @@ export async function launchVSCode(options: LaunchOptions = {}): Promise<{ page:
     JSON.stringify({
       'codin.provider': 'claude',
       'codin.model': 'claude-sonnet-4-5',
-      // Point to mock server via custom base URL (extension must support this)
       'codin.customBaseUrl': MOCK_LLM_URL,
+      // If options.apiKey is explicitly '', we omit it to test onboarding.
+      // Otherwise we inject the mock key so existing tests bypass onboarding.
+      ...(options.apiKey !== '' ? { 'codin.apiKey': options.apiKey ?? 'mock-test-key' } : {})
     }),
     'utf-8'
   );
 
+  const executablePath = await require('@vscode/test-electron').downloadAndUnzipVSCode();
   const app = await electron.launch({
-    executablePath: require('@vscode/test-electron').getVSCodeExecutablePath(),
+    executablePath,
     args: [
       '--extensionDevelopmentPath=' + EXTENSION_ROOT,
       '--disable-extensions',

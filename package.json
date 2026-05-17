@@ -8,9 +8,22 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other", "Machine Learning"],
-  "keywords": ["ai", "agent", "claude", "openai", "coding", "automation", "llm"],
-  "activationEvents": ["onStartupFinished"],
+  "categories": [
+    "Other",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "ai",
+    "agent",
+    "claude",
+    "openai",
+    "coding",
+    "automation",
+    "llm"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -33,6 +46,10 @@
       {
         "command": "codin.toggleDryRun",
         "title": "Codin: Toggle Dry Run"
+      },
+      {
+        "command": "codin.setupWizard",
+        "title": "Codin: Setup Wizard"
       }
     ],
     "viewsContainers": {
@@ -66,10 +83,20 @@
           "type": "string",
           "default": "claude",
           "enum": [
-            "claude", "openai", "groq", "openrouter",
-            "mistral", "deepseek",
-            "moonshot", "kimi", "qwen", "minimax",
-            "ollama", "lmstudio", "jan", "openai-compatible"
+            "claude",
+            "openai",
+            "groq",
+            "openrouter",
+            "mistral",
+            "deepseek",
+            "moonshot",
+            "kimi",
+            "qwen",
+            "minimax",
+            "ollama",
+            "lmstudio",
+            "jan",
+            "openai-compatible"
           ],
           "enumDescriptions": [
             "Anthropic Claude (recommended)",
@@ -130,13 +157,20 @@
         },
         "codin.blockedCommands": {
           "type": "array",
-          "items": { "type": "string" },
-          "default": ["rm -rf /", "sudo"],
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "rm -rf /",
+            "sudo"
+          ],
           "description": "Shell command patterns the agent is not allowed to run."
         },
         "codin.allowedWriteDirectories": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Restrict file writes to these paths (relative to workspace root). Empty = entire workspace allowed."
         },
@@ -180,6 +214,7 @@
     "@vscode/test-electron": "^2.3.8",
     "eslint": "^8.57.0",
     "express": "^4.18.2",
+    "node-fetch": "^2.7.0",
     "prettier": "^3.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"

@@ -62,6 +62,10 @@ export function activate(context: vscode.ExtensionContext): void {
 
     vscode.commands.registerCommand('codin.toggleDryRun', () => {
       ChatPanel.toggleDryRun();
+    }),
+
+    vscode.commands.registerCommand('codin.setupWizard', () => {
+      OnboardingPanel.createOrShow(context.extensionUri, context, settings);
     })
   );
 

@@ -112,6 +112,13 @@ export const ViewColumn = {
   Three: 3,
 } as const;
 
+export const ConfigurationTarget = {
+  Global: 1,
+  Workspace: 2,
+  WorkspaceFolder: 3,
+} as const;
+
+
 export const StatusBarAlignment = {
   Left: 1,
   Right: 2,

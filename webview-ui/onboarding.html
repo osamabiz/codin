@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-{{nonce}}'; style-src {{cspSource}} 'unsafe-inline';">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Codin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--vscode-font-family);
+      font-size: var(--vscode-font-size);
+      color: var(--vscode-foreground);
+      background: var(--vscode-editor-background);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .container {
+      width: 100%;
+      max-width: 560px;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .screen {
+      display: none;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease;
+    }
+    .screen.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      font-size: 1.5em;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+      color: var(--vscode-editor-foreground);
+    }
+    h2 {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+    }
+    p {
+      margin: 0 0 16px 0;
+      line-height: 1.5;
+      opacity: 0.85;
+    }
+    .subtitle {
+      font-size: 1.1em;
+      opacity: 0.9;
+      margin-bottom: 24px;
+    }
+    
+    /* Radio Cards */
+    .radio-card-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .radio-card {
+      border: 1px solid var(--vscode-editorWidget-border, rgba(128,128,128,0.2));
+      border-radius: 6px;
+      padding: 16px;
+      cursor: pointer;
+      background: var(--vscode-editorWidget-background, rgba(128,128,128,0.05));
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .radio-card:hover {
+      background: var(--vscode-list-hoverBackground);
+      border-color: var(--vscode-focusBorder);
+    }
+    .radio-card.selected {
+      border-color: var(--vscode-focusBorder);
+      background: var(--vscode-list-activeSelectionBackground);
+      color: var(--vscode-list-activeSelectionForeground);
+    }
+    .radio-card.selected .card-title,
+    .radio-card.selected .card-desc {
+      color: var(--vscode-list-activeSelectionForeground);
+      opacity: 1;
+    }
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 1.05em;
+    }
+    .card-desc {
+      font-size: 0.9em;
+      opacity: 0.75;
+    }
+
+    /* Buttons */
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+      padding-top: 24px;
+      align-items: center;
+    }
+    .button-group.right {
+      justify-content: flex-end;
+    }
+    .button-group.between {
+      justify-content: space-between;
+    }
+    button {
+      background: var(--vscode-button-background);
+      color: var(--vscode-button-foreground);
+      border: none;
+      border-radius: 2px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: 500;
+    }
+    button:hover { background: var(--vscode-button-hoverBackground); }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    button.secondary {
+      background: var(--vscode-button-secondaryBackground);
+      color: var(--vscode-button-secondaryForeground);
+    }
+    button.secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
+    button.full-width {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1em;
+      margin-top: 24px;
+    }
+    .link-button {
+      background: none;
+      border: none;
+      color: var(--vscode-textLink-foreground);
+      padding: 0;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+    }
+    .link-button:hover {
+      text-decoration: underline;
+      color: var(--vscode-textLink-activeForeground);
+    }
+
+    /* Inputs */
+    .field { margin-bottom: 20px; }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      background: var(--vscode-input-background);
+      color: var(--vscode-input-foreground);
+      border: 1px solid var(--vscode-input-border, transparent);
+      padding: 8px;
+      border-radius: 2px;
+      font-family: inherit;
+      font-size: inherit;
+    }
+    input:focus, select:focus {
+      outline: 1px solid var(--vscode-focusBorder);
+      border-color: transparent;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Status Boxes */
+    .status-box {
+      border: 1px solid var(--vscode-editorWidget-border, rgba(128,128,128,0.2));
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 24px;
+      background: var(--vscode-editorWidget-background, rgba(128,128,128,0.05));
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .status-ok { color: var(--vscode-testing-iconPassed, #73c991); }
+    .status-err { color: var(--vscode-errorForeground, #f48771); }
+    
+    .divider {
+      margin: 24px 0;
+      text-align: center;
+      position: relative;
+    }
+    .divider::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--vscode-editorWidget-border, rgba(128,128,128,0.2));
+      z-index: 1;
+    }
+    .divider span {
+      background: var(--vscode-editor-background);
+      padding: 0 12px;
+      position: relative;
+      z-index: 2;
+      opacity: 0.7;
+      font-size: 0.9em;
+    }
+
+    .chip {
+      background: var(--vscode-editorWidget-background, rgba(128,128,128,0.1));
+      border: 1px solid var(--vscode-editorWidget-border, rgba(128,128,128,0.2));
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+      cursor: pointer;
+    }
+    .chip:hover {
+      background: var(--vscode-list-hoverBackground);
+    }
+    
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px 0;
+    }
+    .checklist li {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .checklist li::before {
+      content: "✓";
+      color: var(--vscode-testing-iconPassed, #73c991);
+      font-weight: bold;
+    }
+
+    .step-header {
+      font-size: 0.85em;
+      opacity: 0.6;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .hidden { display: none !important; }
+
+    .flex-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Screen 1: Path Selection -->
+    <div id="screen-1" class="screen active">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-size: 2em; margin-bottom: 16px;">👾 Codin</h1>
+        <p class="subtitle">Your AI coding agent, your own key.<br>Free. Open source. Works with the AI tools you already know — or none at all.</p>
+      </div>
+
+      <h2>How do you want to power Codin?</h2>
+      
+      <div class="radio-card-group">
+        <div class="radio-card" data-path="local" data-testid="onboard-path-local">
+          <div class="card-title">🖥 Local — 100% free</div>
+          <div class="card-desc">No account. No key. No cost. Ever. Runs on your machine via Ollama.</div>
+        </div>
+        <div class="radio-card" data-path="free" data-testid="onboard-path-free">
+          <div class="card-title">✦ Free cloud API</div>
+          <div class="card-desc">Gemini, Groq, and OpenRouter give you free API keys in 2 minutes.</div>
+        </div>
+        <div class="radio-card" data-path="key" data-testid="onboard-path-key">
+          <div class="card-title">🔑 I have an API key</div>
+          <div class="card-desc">Claude, OpenAI, DeepSeek, and 11 more providers.</div>
+        </div>
+      </div>
+
+      <div class="button-group between">
+        <button class="link-button" id="btn-skip">Skip — go to settings</button>
+        <button id="btn-next-1" disabled data-testid="onboard-next">Next →</button>
+      </div>
+    </div>
+
+    <!-- Screen 2a: Local Path -->
+    <div id="screen-2a" class="screen">
+      <div class="step-header">Step 2 of 3</div>
+      <h1>🖥 Run AI locally — completely free</h1>
+      <p>Ollama runs open-source AI models on your machine. No account, no internet required after setup, no usage limits.</p>
+      
+      <p>Recommended models for coding:<br>
+      • <b>Qwen2.5-Coder 7B</b> (4 GB) — best small coder<br>
+      • <b>DeepSeek-Coder 6.7B</b> (4 GB) — strong at code<br>
+      • <b>Llama 3.1 8B</b> (5 GB) — fast, general purpose</p>
+
+      <div class="status-box">
+        <div class="status-row">
+          <div>Ollama status: <span id="ollama-status-text" class="status-indicator" data-testid="onboard-ollama-status">● Checking...</span></div>
+          <button class="secondary" id="btn-ollama-check" data-testid="onboard-ollama-check">Check again</button>
+        </div>
+        <div id="ollama-not-running">
+          <button class="secondary" id="btn-install-ollama">Install Ollama</button>
+        </div>
+        <div id="ollama-running" class="hidden">
+          <div class="field" style="margin-bottom:0">
+            <label>Model</label>
+            <select id="ollama-models"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Base URL</label>
+        <input type="text" id="ollama-base-url" value="http://localhost:11434">
+      </div>
+      <div class="field">
+        <label>Manual Model Entry (Optional)</label>
+        <input type="text" id="ollama-manual-model" placeholder="e.g. qwen2.5-coder:7b">
+      </div>
+
+      <div class="field">
+        <button class="secondary" id="btn-test-ollama" data-testid="onboard-test-connection">Test connection</button>
+        <span id="ollama-test-status" style="margin-left:12px;" data-testid="onboard-connection-status"></span>
+      </div>
+
+      <div class="button-group between">
+        <button class="secondary" class="btn-back" data-testid="onboard-back">← Back</button>
+        <button id="btn-next-2a" disabled data-testid="onboard-next">Next →</button>
+      </div>
+    </div>
+
+    <!-- Screen 2b: Free Cloud API Path -->
+    <div id="screen-2b" class="screen">
+      <div class="step-header">Step 2 of 3</div>
+      <div class="flex-row">
+        <h1 style="margin:0">✦ Free API key</h1>
+        <select id="free-provider-select" style="width:auto; padding: 4px 8px;">
+          <option value="gemini">Gemini</option>
+          <option value="groq">Groq</option>
+          <option value="openrouter">OpenRouter</option>
+        </select>
+      </div>
+
+      <div id="free-info-gemini">
+        <p>Google Gemini offers a free API tier:<br>
+        • 15 requests/min free · 1M tokens/min · No credit card required</p>
+        <p>1. Click button below<br>
+        2. Sign in with Google<br>
+        3. Click "Create API key"<br>
+        4. Paste it here</p>
+      </div>
+      <div id="free-info-groq" class="hidden">
+        <p>Groq offers ultra-fast inference for open source models.<br>
+        • Llama 3, ultra fast, ~100 req/min</p>
+      </div>
+      <div id="free-info-openrouter" class="hidden">
+        <p>OpenRouter provides access to many models, with several permanently free.<br>
+        • 100+ models, many permanently free</p>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <button class="secondary" id="btn-open-free-link">Open Google AI Studio →</button>
+      </div>
+
+      <div class="field">
+        <label>API Key</label>
+        <div class="input-row">
+          <input type="password" id="free-api-key" placeholder="Paste your key here..." data-testid="onboard-api-key">
+          <button class="secondary" id="btn-toggle-free-key">Show</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <button class="secondary" id="btn-test-free" data-testid="onboard-test-connection">Test connection</button>
+        <span id="free-test-status" style="margin-left:12px;" data-testid="onboard-connection-status"></span>
+      </div>
+
+      <div class="divider"><span>Other free options</span></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        <span>Groq (Llama 3, ultra fast)</span>
+        <button class="link-button btn-switch-free" data-target="groq">Get free key →</button>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>OpenRouter (many models)</span>
+        <button class="link-button btn-switch-free" data-target="openrouter">Get free key →</button>
+      </div>
+
+      <div class="button-group between">
+        <button class="secondary" class="btn-back" data-testid="onboard-back">← Back</button>
+        <button id="btn-next-2b" disabled data-testid="onboard-next">Next →</button>
+      </div>
+    </div>
+
+    <!-- Screen 2c: Have Key Path -->
+    <div id="screen-2c" class="screen">
+      <div class="step-header">Step 2 of 3</div>
+      <h1>🔑 Connect your API key</h1>
+      
+      <div class="field">
+        <label>Provider</label>
+        <select id="key-provider">
+          <optgroup label="── Cloud ──">
+            <option value="claude">Claude (Anthropic)</option>
+            <option value="openai">OpenAI</option>
+            <option value="gemini">Gemini</option>
+            <option value="mistral">Mistral</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="kimi">Kimi</option>
+            <option value="qwen">Qwen</option>
+            <option value="minimax">MiniMax</option>
+          </optgroup>
+          <optgroup label="── Free tier ──">
+            <option value="groq">Groq ✦</option>
+            <option value="openrouter">OpenRouter ✦</option>
+          </optgroup>
+          <optgroup label="── Local ──">
+            <option value="ollama">Ollama</option>
+            <option value="lmstudio">LM Studio</option>
+            <option value="jan">Jan</option>
+          </optgroup>
+          <optgroup label="── Advanced ──">
+            <option value="openai-compatible">Custom (OpenAI-compatible)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="field" id="key-api-key-container">
+        <label>API Key</label>
+        <div class="input-row">
+          <input type="password" id="key-api-key" placeholder="••••••••••••••••••••••••••" data-testid="onboard-api-key">
+          <button class="secondary" id="btn-toggle-key-key">Show</button>
+        </div>
+        <p style="font-size:0.85em; margin-top:4px;">Stored securely. Never leaves your machine except to call the provider you chose.</p>
+      </div>
+
+      <div class="field hidden" id="key-base-url-container">
+        <label>Base URL</label>
+        <input type="text" id="key-base-url" placeholder="http://localhost:...">
+      </div>
+
+      <div class="field">
+        <label>Model</label>
+        <div class="input-row">
+          <select id="key-model"></select>
+          <input type="text" id="key-manual-model" placeholder="Model name" class="hidden" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="field">
+        <button class="secondary" id="btn-test-key" data-testid="onboard-test-connection">Test connection</button>
+        <span id="key-test-status" style="margin-left:12px;" data-testid="onboard-connection-status"></span>
+      </div>
+
+      <div class="divider"><span>Don't have a key?</span></div>
+      <div style="display:flex; flex-wrap:wrap; gap: 16px;">
+        <button class="link-button btn-signup" data-url="https://console.anthropic.com">Claude API →</button>
+        <button class="link-button btn-signup" data-url="https://platform.openai.com">OpenAI API →</button>
+        <button class="link-button btn-signup" data-url="https://console.groq.com">Groq (free) →</button>
+        <button class="link-button btn-signup" data-url="https://aistudio.google.com/app/apikey">Gemini (free) →</button>
+      </div>
+
+      <div class="button-group between">
+        <button class="secondary" class="btn-back" data-testid="onboard-back">← Back</button>
+        <button id="btn-next-2c" disabled data-testid="onboard-next">Next →</button>
+      </div>
+    </div>
+
+    <!-- Screen 3: Ready -->
+    <div id="screen-3" class="screen">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 3em; margin-bottom: 16px;">✅</div>
+        <h1>You're ready</h1>
+        <p id="ready-connected-text" style="font-weight: 600;"></p>
+      </div>
+
+      <h2>Try your first task</h2>
+      <div class="chip">Create a TypeScript function that validates email and write a test for it</div>
+      <div class="chip">Read my package.json and tell me which dependencies are outdated</div>
+      <div class="chip">Find all TODO comments in this project and summarise them</div>
+
+      <h2 style="margin-top: 24px;">What Codin can do</h2>
+      <ul class="checklist">
+        <li>Reads and writes files (with your approval)</li>
+        <li>Runs terminal commands (with your approval)</li>
+        <li>Searches your entire codebase</li>
+        <li>Plans multi-step tasks automatically</li>
+        <li>Saves task history per project</li>
+      </ul>
+
+      <button class="full-width" id="btn-start" data-testid="onboard-start">Start coding →</button>
+      
+      <div style="text-align: center; margin-top: 16px; font-size: 0.9em; opacity: 0.7;">
+        Settings · Docs · GitHub
+      </div>
+    </div>
+
+  </div>
+
+  <script nonce="{{nonce}}">
+    const vscode = acquireVsCodeApi();
+    
+    // State
+    let currentPath = null;
+    let selectedProvider = null;
+    let finalApiKey = '';
+    let finalBaseUrl = '';
+    let finalModel = '';
+
+    // Elements
+    const screens = {
+      1: document.getElementById('screen-1'),
+      '2a': document.getElementById('screen-2a'),
+      '2b': document.getElementById('screen-2b'),
+      '2c': document.getElementById('screen-2c'),
+      3: document.getElementById('screen-3')
+    };
+
+    function showScreen(id) {
+      Object.values(screens).forEach(s => s.classList.remove('active'));
+      screens[id].classList.add('active');
+    }
+
+    // --- Screen 1 ---
+    const radioCards = document.querySelectorAll('.radio-card');
+    const btnNext1 = document.getElementById('btn-next-1');
+    
+    radioCards.forEach(card => {
+      card.addEventListener('click', () => {
+        radioCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        currentPath = card.dataset.path;
+        btnNext1.disabled = false;
+      });
+    });
+
+    btnNext1.addEventListener('click', () => {
+      if (currentPath === 'local') {
+        showScreen('2a');
+        checkOllama();
+      } else if (currentPath === 'free') {
+        showScreen('2b');
+      } else if (currentPath === 'key') {
+        showScreen('2c');
+        populateKeyModels();
+      }
+    });
+
+    document.getElementById('btn-skip').addEventListener('click', () => {
+      vscode.postMessage({ type: 'skip_onboarding' });
+    });
+
+    document.querySelectorAll('.btn-back').forEach(btn => {
+      btn.addEventListener('click', () => showScreen('1'));
+    });
+
+    // --- Screen 2a (Local) ---
+    function checkOllama() {
+      const statusText = document.getElementById('ollama-status-text');
+      statusText.innerHTML = '● Checking...';
+      statusText.className = 'status-indicator';
+      const baseUrl = document.getElementById('ollama-base-url').value;
+      vscode.postMessage({ type: 'detect_ollama', baseUrl });
+    }
+
+    document.getElementById('btn-ollama-check').addEventListener('click', checkOllama);
+    document.getElementById('btn-install-ollama').addEventListener('click', () => {
+      vscode.postMessage({ type: 'open_url', url: 'https://ollama.com/download' });
+    });
+
+    document.getElementById('btn-test-ollama').addEventListener('click', () => {
+      const baseUrl = document.getElementById('ollama-base-url').value;
+      const selectModel = document.getElementById('ollama-models').value;
+      const manualModel = document.getElementById('ollama-manual-model').value;
+      const model = manualModel || selectModel;
+      
+      const statusSpan = document.getElementById('ollama-test-status');
+      statusSpan.innerHTML = 'Testing...';
+      statusSpan.className = '';
+      
+      finalApiKey = '';
+      finalBaseUrl = baseUrl;
+      finalModel = model;
+      selectedProvider = 'ollama';
+
+      vscode.postMessage({
+        type: 'test_connection_onboard',
+        provider: 'ollama',
+        baseUrl,
+        model
+      });
+    });
+
+    // --- Screen 2b (Free) ---
+    const freeLinks = {
+      gemini: { url: 'https://aistudio.google.com/app/apikey', label: 'Open Google AI Studio →' },
+      groq: { url: 'https://console.groq.com', label: 'Open Groq Console →' },
+      openrouter: { url: 'https://openrouter.ai', label: 'Open OpenRouter →' }
+    };
+
+    function updateFreeScreen(provider) {
+      document.getElementById('free-provider-select').value = provider;
+      document.getElementById('free-info-gemini').classList.add('hidden');
+      document.getElementById('free-info-groq').classList.add('hidden');
+      document.getElementById('free-info-openrouter').classList.add('hidden');
+      document.getElementById(\`free-info-\${provider}\`).classList.remove('hidden');
+      
+      const btn = document.getElementById('btn-open-free-link');
+      btn.textContent = freeLinks[provider].label;
+      btn.onclick = () => vscode.postMessage({ type: 'open_url', url: freeLinks[provider].url });
+    }
+
+    document.getElementById('free-provider-select').addEventListener('change', (e) => {
+      updateFreeScreen(e.target.value);
+    });
+    
+    updateFreeScreen('gemini');
+
+    document.querySelectorAll('.btn-switch-free').forEach(btn => {
+      btn.addEventListener('click', (e) => updateFreeScreen(e.target.dataset.target));
+    });
+
+    document.getElementById('btn-toggle-free-key').addEventListener('click', (e) => {
+      const input = document.getElementById('free-api-key');
+      if (input.type === 'password') {
+        input.type = 'text';
+        e.target.textContent = 'Hide';
+      } else {
+        input.type = 'password';
+        e.target.textContent = 'Show';
+      }
+    });
+
+    document.getElementById('btn-test-free').addEventListener('click', () => {
+      const provider = document.getElementById('free-provider-select').value;
+      const apiKey = document.getElementById('free-api-key').value.trim();
+      
+      const statusSpan = document.getElementById('free-test-status');
+      statusSpan.innerHTML = 'Testing...';
+      statusSpan.className = '';
+      
+      finalApiKey = apiKey;
+      finalBaseUrl = '';
+      selectedProvider = provider;
+      // Models will be defaulted on completion if needed
+
+      vscode.postMessage({
+        type: 'test_connection_onboard',
+        provider,
+        apiKey
+      });
+    });
+
+    // --- Screen 2c (Key) ---
+    const MODELS = {
+      claude: [
+        { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5' },
+        { id: 'claude-opus-4-5', name: 'Claude Opus 4.5' },
+        { id: 'claude-haiku-4-5', name: 'Claude Haiku 4.5' },
+      ],
+      openai: [
+        { id: 'gpt-4o', name: 'GPT-4o' },
+        { id: 'gpt-4o-mini', name: 'GPT-4o mini' },
+      ],
+      gemini: [
+        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+        { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+      ],
+      mistral: [{ id: 'codestral-latest', name: 'Codestral' }],
+      deepseek: [{ id: 'deepseek-chat', name: 'DeepSeek Chat' }, { id: 'deepseek-coder', name: 'DeepSeek Coder' }],
+      kimi: [{ id: 'moonshot-v1-32k', name: 'Kimi 32k' }],
+      qwen: [{ id: 'qwen-max', name: 'Qwen Max' }],
+      minimax: [{ id: 'abab6.5s-chat', name: 'MiniMax abab6.5s' }],
+      groq: [{ id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' }],
+      openrouter: [{ id: 'meta-llama/llama-3.1-8b-instruct:free', name: 'Llama 3.1 8B (free)' }],
+      ollama: [{ id: 'qwen2.5-coder', name: 'Qwen 2.5 Coder' }],
+      lmstudio: [{ id: 'local-model', name: 'Local Model' }],
+      jan: [{ id: 'local-model', name: 'Local Model' }],
+      'openai-compatible': []
+    };
+
+    function populateKeyModels() {
+      const provider = document.getElementById('key-provider').value;
+      const select = document.getElementById('key-model');
+      const manual = document.getElementById('key-manual-model');
+      
+      const isLocal = ['ollama', 'lmstudio', 'jan', 'openai-compatible'].includes(provider);
+      document.getElementById('key-api-key-container').classList.toggle('hidden', isLocal);
+      document.getElementById('key-base-url-container').classList.toggle('hidden', !isLocal);
+      
+      if (provider === 'openai-compatible') {
+        select.classList.add('hidden');
+        manual.classList.remove('hidden');
+      } else {
+        select.classList.remove('hidden');
+        manual.classList.add('hidden');
+        select.innerHTML = '';
+        (MODELS[provider] || []).forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.name;
+          select.appendChild(opt);
+        });
+      }
+    }
+
+    document.getElementById('key-provider').addEventListener('change', populateKeyModels);
+    
+    document.getElementById('btn-toggle-key-key').addEventListener('click', (e) => {
+      const input = document.getElementById('key-api-key');
+      if (input.type === 'password') {
+        input.type = 'text';
+        e.target.textContent = 'Hide';
+      } else {
+        input.type = 'password';
+        e.target.textContent = 'Show';
+      }
+    });
+
+    document.getElementById('btn-test-key').addEventListener('click', () => {
+      const provider = document.getElementById('key-provider').value;
+      const apiKey = document.getElementById('key-api-key').value.trim();
+      const baseUrl = document.getElementById('key-base-url').value.trim();
+      
+      let model = '';
+      if (provider === 'openai-compatible') {
+        model = document.getElementById('key-manual-model').value.trim();
+      } else {
+        model = document.getElementById('key-model').value;
+      }
+      
+      const statusSpan = document.getElementById('key-test-status');
+      statusSpan.innerHTML = 'Testing...';
+      statusSpan.className = '';
+      
+      finalApiKey = apiKey;
+      finalBaseUrl = baseUrl;
+      finalModel = model;
+      selectedProvider = provider;
+
+      vscode.postMessage({
+        type: 'test_connection_onboard',
+        provider,
+        apiKey,
+        baseUrl,
+        model
+      });
+    });
+
+    document.querySelectorAll('.btn-signup').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        vscode.postMessage({ type: 'open_url', url: e.target.dataset.url });
+      });
+    });
+
+    // --- Message handling ---
+    window.addEventListener('message', event => {
+      const msg = event.data;
+      if (msg.type === 'ollama_status') {
+        const statusText = document.getElementById('ollama-status-text');
+        if (msg.running) {
+          statusText.innerHTML = \`✅ Running (\${msg.models.length} models)\`;
+          statusText.className = 'status-indicator status-ok';
+          document.getElementById('ollama-not-running').classList.add('hidden');
+          document.getElementById('ollama-running').classList.remove('hidden');
+          
+          const select = document.getElementById('ollama-models');
+          select.innerHTML = '';
+          let selected = '';
+          msg.models.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m;
+            select.appendChild(opt);
+            if (!selected && (m.includes('coder') || m.includes('qwen'))) selected = m;
+          });
+          if (selected) select.value = selected;
+          else if (msg.models.length > 0) select.value = msg.models[0];
+        } else {
+          statusText.innerHTML = '● Not detected';
+          statusText.className = 'status-indicator status-err';
+          document.getElementById('ollama-not-running').classList.remove('hidden');
+          document.getElementById('ollama-running').classList.add('hidden');
+        }
+      } else if (msg.type === 'connection_result') {
+        let statusSpan, nextBtn;
+        if (currentPath === 'local') {
+          statusSpan = document.getElementById('ollama-test-status');
+          nextBtn = document.getElementById('btn-next-2a');
+        } else if (currentPath === 'free') {
+          statusSpan = document.getElementById('free-test-status');
+          nextBtn = document.getElementById('btn-next-2b');
+          if (msg.ok) {
+            // Set default model based on provider
+            if (selectedProvider === 'gemini') finalModel = 'gemini-2.5-flash';
+            else if (selectedProvider === 'groq') finalModel = 'llama-3.3-70b-versatile';
+            else if (selectedProvider === 'openrouter') finalModel = 'meta-llama/llama-3.1-8b-instruct:free';
+          }
+        } else {
+          statusSpan = document.getElementById('key-test-status');
+          nextBtn = document.getElementById('btn-next-2c');
+        }
+
+        if (msg.ok) {
+          statusSpan.innerHTML = '✅ Connected' + (finalModel ? \` — \${finalModel} ready\` : '');
+          statusSpan.className = 'status-ok';
+          nextBtn.disabled = false;
+          // Set up screen 3
+          document.getElementById('ready-connected-text').textContent = \`Connected to: \${selectedProvider}\${finalModel ? ' — ' + finalModel : ''}\`;
+        } else {
+          statusSpan.innerHTML = '❌ Connection failed: ' + (msg.error || 'Unknown error');
+          statusSpan.className = 'status-err';
+          nextBtn.disabled = true;
+        }
+      }
+    });
+
+    document.getElementById('btn-next-2a').addEventListener('click', () => showScreen('3'));
+    document.getElementById('btn-next-2b').addEventListener('click', () => showScreen('3'));
+    document.getElementById('btn-next-2c').addEventListener('click', () => showScreen('3'));
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      vscode.postMessage({
+        type: 'setup_complete',
+        provider: selectedProvider,
+        apiKey: finalApiKey,
+        baseUrl: finalBaseUrl,
+        model: finalModel
+      });
+    });
+  </script>
+</body>
+</html>
