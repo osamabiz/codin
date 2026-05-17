@@ -126,7 +126,7 @@ User types task in chat panel
 - **Conversation history** — stored in-memory per session, serialized to workspace `.agent-history.json` for persistence
 - **Workspace snapshot** — list of files + git status, refreshed before each agent turn
 - **Task state** — current plan, completed steps, pending steps — shown in sidebar task view
-- **Settings** — API keys in VS Code `SecretStorage`, other preferences in `workspace.getConfiguration('codin')`
+- **Settings** — API keys in VS Code `SecretStorage`, other preferences in `workspace.getConfiguration('agentPlugin')`
 
 ## Security model
 

@@ -1,5 +1,7 @@
 import { ClaudeProvider } from './claude';
 import { OpenAIProvider } from './openai';
+import { GroqProvider } from './groq';
+import { OpenRouterProvider } from './openrouter';
 import { OllamaProvider } from './ollama';
 import { MistralProvider } from './mistral';
 import { DeepSeekProvider } from './deepseek';
@@ -16,13 +18,15 @@ import type { ILLMProvider } from './types';
 const _providers: Record<string, ILLMProvider> = {
   claude: new ClaudeProvider(),
   openai: new OpenAIProvider(),
-  ollama: new OllamaProvider(),
+  groq: new GroqProvider(),
+  openrouter: new OpenRouterProvider(),
   mistral: new MistralProvider(),
   deepseek: new DeepSeekProvider(),
   moonshot: new MoonshotProvider(),
   kimi: new KimiProvider(),
   qwen: new QwenProvider(),
   minimax: new MiniMaxProvider(),
+  ollama: new OllamaProvider(),
   lmstudio: new LMStudioProvider(),
   jan: new JanProvider(),
   'openai-compatible': new OpenAICompatibleProvider(),

@@ -62,11 +62,11 @@ Implement Phase 5 polish (builds on Phase 4):
 6. Blocked commands UI in settings:
    - Render current blocked patterns as a list with × remove buttons
    - Text input + "Add pattern" button
-   - Persist to codin.blockedCommands setting
+   - Persist to agentPlugin.blockedCommands setting
 
 7. Allowed write directories UI in settings:
    - Same pattern as blocked commands
-   - Persist to codin.allowedWriteDirectories
+   - Persist to agentPlugin.allowedWriteDirectories
 
 Tests to write:
 - Status bar transitions: idle → running → waiting → idle

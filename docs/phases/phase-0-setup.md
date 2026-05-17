@@ -27,8 +27,8 @@ Read docs/overview.md and docs/architecture.md first.
 
 Then scaffold a VS Code extension with:
 - TypeScript + strict mode
-- A webview panel command "Agent: Open Chat" (command id: codin.openChat)
-- An activity bar view container with a tree view (view id: codin.sidebar)
+- A webview panel command "Agent: Open Chat" (command id: agentPlugin.openChat)
+- An activity bar view container with a tree view (view id: agentPlugin.sidebar)
 - Vitest for unit tests with a sample passing test
 - ESLint + Prettier configured
 - GitHub Actions workflow: .github/workflows/ci.yml — runs "npm run lint" and "npm test" on push/PR to main
@@ -83,21 +83,21 @@ vscode-agent/
 {
   "contributes": {
     "commands": [
-      { "command": "codin.openChat", "title": "Agent: Open Chat" }
+      { "command": "agentPlugin.openChat", "title": "Agent: Open Chat" }
     ],
     "viewsContainers": {
       "activitybar": [
-        { "id": "codin", "title": "AI Agent", "icon": "$(robot)" }
+        { "id": "agentPlugin", "title": "AI Agent", "icon": "$(robot)" }
       ]
     },
     "views": {
-      "codin": [
-        { "id": "codin.sidebar", "name": "Agent" }
+      "agentPlugin": [
+        { "id": "agentPlugin.sidebar", "name": "Agent" }
       ]
     },
     "keybindings": [
       {
-        "command": "codin.openChat",
+        "command": "agentPlugin.openChat",
         "key": "ctrl+shift+a",
         "mac": "cmd+shift+a"
       }

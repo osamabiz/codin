@@ -66,7 +66,7 @@ interface TokenUsage {
 - Auth header: `x-api-key: {key}`, `anthropic-version: 2023-06-01`
 - Streaming: SSE (`stream: true`)
 - Tool use: native (`tools` array in request body)
-- Key setting: `codin.apiKey` (SecretStorage)
+- Key setting: `agentPlugin.apiKey` (SecretStorage)
 - Recommended model: `claude-sonnet-4` (best tool-use / cost balance)
 - Also supports: `claude-opus-4`, `claude-haiku-4-5`
 

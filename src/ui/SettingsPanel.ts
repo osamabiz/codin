@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { SettingsManager } from '../utils/SettingsManager';
 import { getProvider, configureProvider } from '../providers';
+import { OpenRouterProvider } from '../providers/openrouter';
 
 export class SettingsPanel {
   private static _currentPanel: SettingsPanel | undefined;
@@ -81,8 +82,15 @@ export class SettingsPanel {
         const keyToUse = apiKey || (await this._settings.getApiKey(provider));
         configureProvider(provider, keyToUse, customBaseUrl || undefined);
         try {
-          const result = await getProvider(provider).testConnection();
+          const p = getProvider(provider);
+          const result = await p.testConnection();
           void this._panel.webview.postMessage({ command: 'testResult', ...result });
+
+          // After successful OpenRouter test, fetch full model list
+          if (result.ok && provider === 'openrouter' && p instanceof OpenRouterProvider) {
+            const models = await p.fetchAvailableModels();
+            void this._panel.webview.postMessage({ command: 'detectedModels', models });
+          }
         } catch (err) {
           void this._panel.webview.postMessage({
             command: 'testResult',
@@ -225,7 +233,11 @@ export class SettingsPanel {
   <div class="field">
     <label for="provider">Provider</label>
     <select id="provider">
-      <optgroup label="Cloud AI">
+      <optgroup label="── Free tier available ──">
+        <option value="groq">Groq ✦ free tier</option>
+        <option value="openrouter">OpenRouter ✦ free models</option>
+      </optgroup>
+      <optgroup label="── Cloud AI ──">
         <option value="claude">Claude (Anthropic)</option>
         <option value="openai">OpenAI</option>
         <option value="mistral">Mistral AI</option>
@@ -235,12 +247,12 @@ export class SettingsPanel {
         <option value="qwen">Qwen (Alibaba Cloud)</option>
         <option value="minimax">MiniMax</option>
       </optgroup>
-      <optgroup label="Local">
+      <optgroup label="── Local (always free) ──">
         <option value="ollama">Ollama (local)</option>
         <option value="lmstudio">LM Studio (local)</option>
         <option value="jan">Jan.ai (local)</option>
       </optgroup>
-      <optgroup label="Custom">
+      <optgroup label="── Custom ──">
         <option value="openai-compatible">Custom (OpenAI-compatible)</option>
       </optgroup>
     </select>
@@ -339,6 +351,19 @@ export class SettingsPanel {
         { id: 'qwen-turbo', name: 'Qwen Turbo' },
         { id: 'qwen-coder-plus', name: 'Qwen Coder Plus' },
       ],
+      groq: [
+        { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B (recommended)' },
+        { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B (fastest)' },
+        { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B (long context)' },
+        { id: 'gemma2-9b-it', name: 'Gemma 2 9B' },
+        { id: 'llama3-groq-70b-8192-tool-use-preview', name: 'Llama 3 70B Tool Use (best for agent)' },
+      ],
+      openrouter: [
+        { id: 'meta-llama/llama-3.1-8b-instruct:free', name: 'Llama 3.1 8B Instruct (free)' },
+        { id: 'mistralai/mistral-7b-instruct:free', name: 'Mistral 7B Instruct (free)' },
+        { id: 'google/gemma-2-9b-it:free', name: 'Gemma 2 9B IT (free)' },
+        { id: 'microsoft/phi-3-mini-128k-instruct:free', name: 'Phi 3 Mini 128K Instruct (free)' },
+      ],
       minimax: [
         { id: 'abab6.5s-chat', name: 'MiniMax abab6.5s (recommended)' },
         { id: 'abab5.5-chat', name: 'MiniMax abab5.5' },
@@ -404,7 +429,7 @@ export class SettingsPanel {
 
     function syncFieldVisibility() {
       const p = providerEl.value;
-      apiKeyField.style.display = NO_KEY_PROVIDERS.has(p) ? 'none' : '';
+      apiKeyField.style.display = NO_KEY_PROVIDERS.has(p) ? 'none' : 'block';
       baseUrlField.style.display = LOCAL_PROVIDERS.has(p) ? '' : 'none';
     }
 
@@ -501,6 +526,10 @@ export class SettingsPanel {
     document.getElementById('testConn').addEventListener('click', () => {
       statusEl.textContent = 'Testing…';
       statusEl.className = '';
+      // Show loading state for OpenRouter model dropdown
+      if (providerEl.value === 'openrouter') {
+        modelEl.innerHTML = '<option value="">Loading models...</option>';
+      }
       vscode.postMessage({
         command: 'testConnection',
         provider: providerEl.value,

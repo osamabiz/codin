@@ -34,6 +34,13 @@ export function activate(context: vscode.ExtensionContext): void {
     showCollapseAll: false,
   });
 
+  // Auto-open chat when the sidebar icon is clicked.
+  treeView.onDidChangeVisibility((e) => {
+    if (e.visible) {
+      ChatPanel.createOrShow(context.extensionUri, settings, sidebar, statusBar);
+    }
+  });
+
   context.subscriptions.push(
     treeView,
 

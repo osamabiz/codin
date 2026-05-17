@@ -138,11 +138,11 @@ suite('Extension activation', () => {
   test('all commands are registered', async () => {
     const commands = await vscode.commands.getCommands();
     const expected = [
-      'codin.openChat',
-      'codin.newChat',
-      'codin.openSettings',
-      'codin.stopAgent',
-      'codin.toggleDryRun',
+      'agentPlugin.openChat',
+      'agentPlugin.newChat',
+      'agentPlugin.openSettings',
+      'agentPlugin.stopAgent',
+      'agentPlugin.toggleDryRun',
     ];
     for (const cmd of expected) {
       assert.ok(commands.includes(cmd), `Missing command: ${cmd}`);
@@ -152,7 +152,7 @@ suite('Extension activation', () => {
   test('status bar item is visible', async () => {
     // Extension activates → status bar item appears
     // Indirect: if no exception thrown, item was created
-    await vscode.commands.executeCommand('codin.openChat');
+    await vscode.commands.executeCommand('agentPlugin.openChat');
     // Give webview time to load
     await new Promise(r => setTimeout(r, 1000));
     // No assertion needed — if command throws, test fails
@@ -164,17 +164,17 @@ suite('Extension activation', () => {
 ```typescript
 suite('Settings', () => {
   test('provider setting defaults to claude', () => {
-    const config = vscode.workspace.getConfiguration('codin');
+    const config = vscode.workspace.getConfiguration('agentPlugin');
     assert.strictEqual(config.get('provider'), 'claude');
   });
 
   test('maxSteps defaults to 25', () => {
-    const config = vscode.workspace.getConfiguration('codin');
+    const config = vscode.workspace.getConfiguration('agentPlugin');
     assert.strictEqual(config.get('maxSteps'), 25);
   });
 
   test('can update provider setting', async () => {
-    const config = vscode.workspace.getConfiguration('codin');
+    const config = vscode.workspace.getConfiguration('agentPlugin');
     await config.update('provider', 'openai', vscode.ConfigurationTarget.Workspace);
     assert.strictEqual(config.get('provider'), 'openai');
     // Restore

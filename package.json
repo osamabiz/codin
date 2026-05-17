@@ -66,13 +66,16 @@
           "type": "string",
           "default": "claude",
           "enum": [
-            "claude", "openai", "mistral", "deepseek",
+            "claude", "openai", "groq", "openrouter",
+            "mistral", "deepseek",
             "moonshot", "kimi", "qwen", "minimax",
             "ollama", "lmstudio", "jan", "openai-compatible"
           ],
           "enumDescriptions": [
             "Anthropic Claude (recommended)",
             "OpenAI GPT models",
+            "Groq (free tier available)",
+            "OpenRouter (free models available)",
             "Mistral AI",
             "DeepSeek",
             "Moonshot AI",

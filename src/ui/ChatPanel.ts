@@ -518,14 +518,17 @@ export class ChatPanel {
 
       case 'step_start':
         this._sidebar?.setStepActive(event.step.index);
+        void this._panel.webview.postMessage({ command: 'stepUpdate', stepIndex: event.step.index, status: 'active' });
         break;
 
       case 'step_done':
         this._sidebar?.setStepDone(event.step.index);
+        void this._panel.webview.postMessage({ command: 'stepUpdate', stepIndex: event.step.index, status: 'done' });
         break;
 
       case 'done':
         this._sidebar?.completeTask();
+        void this._panel.webview.postMessage({ command: 'taskComplete' });
         void this._panel.webview.postMessage({ command: 'done', usage: null });
         break;
 
@@ -692,7 +695,7 @@ export class ChatPanel {
       opacity: 1;
       border-color: transparent;
     }
-    #settingsBtn {
+    .topbar-icon-btn {
       background: none;
       border: none;
       color: var(--vscode-editor-foreground);
@@ -702,7 +705,52 @@ export class ChatPanel {
       font-size: 1.1em;
       opacity: 0.7;
     }
-    #settingsBtn:hover { opacity: 1; background: var(--vscode-toolbar-hoverBackground); }
+    .topbar-icon-btn:hover { opacity: 1; background: var(--vscode-toolbar-hoverBackground); }
+    .topbar-icon-btn.active { opacity: 1; background: var(--vscode-toolbar-hoverBackground); }
+
+    /* ── Agent status dropdown ── */
+    #agentDropdown {
+      display: none;
+      border-bottom: 1px solid var(--vscode-editorWidget-border, rgba(128,128,128,0.2));
+      background: var(--vscode-editorWidget-background, rgba(128,128,128,0.06));
+      padding: 10px 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      font-size: 0.88em;
+    }
+    #agentDropdown.open { display: block; }
+    .dropdown-section { margin-bottom: 10px; }
+    .dropdown-section:last-child { margin-bottom: 0; }
+    .dropdown-section-title {
+      font-size: 0.78em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.55;
+      margin-bottom: 4px;
+    }
+    .dropdown-task {
+      font-weight: 600;
+      padding: 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dropdown-step {
+      padding: 1px 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .dropdown-step-icon { flex-shrink: 0; font-size: 0.85em; }
+    .dropdown-step-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dropdown-history-item {
+      padding: 1px 0;
+      opacity: 0.7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dropdown-empty { opacity: 0.4; font-style: italic; }
 
     /* ── Message list ── */
     #messages {
@@ -981,7 +1029,23 @@ export class ChatPanel {
     <span>Codin</span>
     <div class="topbar-actions">
       <button id="dryRunBtn" title="Toggle dry-run mode (preview without executing)">Dry Run</button>
-      <button id="settingsBtn" title="Open Settings">&#9881;</button>
+      <button class="topbar-icon-btn" id="agentStatusBtn" title="Task / Plan / History">&#9776;</button>
+      <button class="topbar-icon-btn" id="settingsBtn" title="Open Settings">&#9881;</button>
+    </div>
+  </div>
+
+  <div id="agentDropdown">
+    <div class="dropdown-section">
+      <div class="dropdown-section-title">Current Task</div>
+      <div class="dropdown-task" id="ddTask">No active task</div>
+    </div>
+    <div class="dropdown-section">
+      <div class="dropdown-section-title">Plan</div>
+      <div id="ddPlan"><span class="dropdown-empty">No active plan</span></div>
+    </div>
+    <div class="dropdown-section">
+      <div class="dropdown-section-title">History</div>
+      <div id="ddHistory"><span class="dropdown-empty">Completed tasks appear here</span></div>
     </div>
   </div>
 
@@ -1245,9 +1309,52 @@ export class ChatPanel {
     updateTokenCount();
   });
 
-  document.getElementById('settingsBtn').addEventListener('click', () => {
-    vscode.postMessage({ command: 'openSettings' });
-  });
+   document.getElementById('settingsBtn').addEventListener('click', () => {
+     vscode.postMessage({ command: 'openSettings' });
+   });
+
+   // ── Agent status dropdown ──────────────────────────────────────────────
+   const agentDropdown = document.getElementById('agentDropdown');
+   const agentStatusBtn = document.getElementById('agentStatusBtn');
+   const ddTask = document.getElementById('ddTask');
+   const ddPlan = document.getElementById('ddPlan');
+   const ddHistory = document.getElementById('ddHistory');
+   const taskHistory = [];
+   let currentPlanSteps = [];
+
+   agentStatusBtn.addEventListener('click', () => {
+     agentDropdown.classList.toggle('open');
+     agentStatusBtn.classList.toggle('active');
+   });
+
+   function renderDropdownPlan() {
+     if (currentPlanSteps.length === 0) {
+       ddPlan.innerHTML = '<span class="dropdown-empty">No active plan</span>';
+       return;
+     }
+     ddPlan.innerHTML = '';
+     currentPlanSteps.forEach(s => {
+       const icon = { pending: '⬜', active: '🔄', done: '✅', failed: '❌' }[s.status] || '⬜';
+       const row = document.createElement('div');
+       row.className = 'dropdown-step';
+       row.innerHTML = '<span class="dropdown-step-icon">' + icon + '</span><span class="dropdown-step-text">' + escHtml(s.index + '. ' + s.description) + '</span>';
+       ddPlan.appendChild(row);
+     });
+   }
+
+   function renderDropdownHistory() {
+     if (taskHistory.length === 0) {
+       ddHistory.innerHTML = '<span class="dropdown-empty">Completed tasks appear here</span>';
+       return;
+     }
+     ddHistory.innerHTML = '';
+     taskHistory.forEach(h => {
+       const row = document.createElement('div');
+       row.className = 'dropdown-history-item';
+       row.textContent = '• ' + h;
+       ddHistory.appendChild(row);
+     });
+   }
 
   // ── Messages from extension host ───────────────────────────────────────────
   window.addEventListener('message', (event) => {
@@ -1373,7 +1480,26 @@ export class ChatPanel {
         break;
       }
       case 'planReady': {
-        // Plan received — sidebar handles display; no extra chat-panel UI needed
+        ddTask.textContent = msg.taskSummary || 'Running…';
+        currentPlanSteps = (msg.steps || []).map(s => ({...s}));
+        renderDropdownPlan();
+        break;
+      }
+      case 'stepUpdate': {
+        const si = currentPlanSteps.findIndex(s => s.index === msg.stepIndex);
+        if (si >= 0) currentPlanSteps[si].status = msg.status;
+        renderDropdownPlan();
+        break;
+      }
+      case 'taskComplete': {
+        if (ddTask.textContent && ddTask.textContent !== 'No active task') {
+          taskHistory.unshift(ddTask.textContent);
+          if (taskHistory.length > 10) taskHistory.pop();
+          renderDropdownHistory();
+        }
+        ddTask.textContent = 'No active task';
+        currentPlanSteps = [];
+        renderDropdownPlan();
         break;
       }
     }

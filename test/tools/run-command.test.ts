@@ -150,7 +150,7 @@ describe('runCommand tool', () => {
     const result = await runCommand.execute({ command: 'nonexistent-cmd' }, makeContext());
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.output).toContain('127');
+    expect(result.error).toContain('127');
   });
 
   // ── Timeout ────────────────────────────────────────────────────────────────
@@ -181,6 +181,6 @@ describe('runCommand tool', () => {
     const result = await runCommand.execute({ command: 'sleep 999' }, makeContext());
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.output).toMatch(/timed out/i);
+    expect(result.error).toMatch(/timed out/i);
   });
 });
