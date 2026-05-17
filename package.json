@@ -10,7 +10,7 @@
   },
   "categories": ["Other", "Machine Learning"],
   "keywords": ["ai", "agent", "claude", "openai", "coding", "automation", "llm"],
-  "activationEvents": [],
+  "activationEvents": ["onStartupFinished"],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -85,6 +85,11 @@
             "Custom OpenAI-compatible endpoint"
           ],
           "description": "LLM provider to use for the agent."
+        },
+        "codin.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for the selected LLM provider. Stored securely in VS Code SecretStorage. You can also set this via the Codin Settings panel (Ctrl+Shift+P → Codin: Open Settings)."
         },
         "codin.customBaseUrl": {
           "type": "string",

@@ -103,6 +103,9 @@ export const runCommand: ITool = {
       (out ? `stdout:\n${out}\n` : '') +
       (err ? `stderr:\n${err}` : '');
 
-    return { ok: result.exitCode === 0, output: output.trim() };
+    if (result.exitCode === 0) {
+      return { ok: true, output: output.trim() };
+    }
+    return { ok: false, error: output.trim() };
   },
 };

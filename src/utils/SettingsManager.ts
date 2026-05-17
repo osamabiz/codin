@@ -6,7 +6,21 @@ export class SettingsManager {
   constructor(private readonly _secrets: vscode.SecretStorage) {}
 
   async getApiKey(providerId: string): Promise<string> {
-    return (await this._secrets.get(`${SECRET_KEY_PREFIX}${providerId}`)) ?? '';
+    // Check SecretStorage first (preferred)
+    const secretKey = await this._secrets.get(`${SECRET_KEY_PREFIX}${providerId}`);
+    if (secretKey) return secretKey;
+
+    // Fallback: check VS Code settings (codin.apiKey) for users who paste there
+    const cfg = vscode.workspace.getConfiguration('codin');
+    const settingsKey = cfg.get<string>('apiKey', '');
+    if (settingsKey) {
+      // Migrate to SecretStorage and clear from settings for security
+      await this._secrets.store(`${SECRET_KEY_PREFIX}${providerId}`, settingsKey);
+      await cfg.update('apiKey', '', vscode.ConfigurationTarget.Global);
+      return settingsKey;
+    }
+
+    return '';
   }
 
   async setApiKey(providerId: string, key: string): Promise<void> {
