@@ -15,15 +15,21 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --background: #0d0d14;
-      --surface: #1a1a2e;
-      --border: #2a2a4a;
-      --accent: #7c6af7;
-      --accent-light: #a89cf7;
-      --text: #e8e8f0;
-      --text-muted: #8888aa;
-      --free-badge: #2d4a2d;
-      --free-text: #6fcf6f;
+      --background: #ffffff;
+      --surface: #f8fafc;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --accent-light: #1d4ed8;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --free-badge: #dcfce7;
+      --free-text: #15803d;
+      
+      --color-gold: #f59e0b;
+      --color-green: #10b981;
+      --color-blue: #3b82f6;
+      --color-red: #ef4444;
+      --color-redmoon: #9f1239;
       --font-mono: 'JetBrains Mono', monospace;
       --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     }
@@ -36,6 +42,10 @@
 
     body {
       background-color: var(--background);
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
       color: var(--text);
       font-family: var(--font-body);
       line-height: 1.6;
@@ -125,7 +135,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(13, 13, 20, 0.9);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
       padding: 16px 0;
@@ -162,13 +172,18 @@
     .hero {
       padding: 100px 0 80px;
       text-align: center;
-      background: radial-gradient(circle at 50% 0%, rgba(124, 106, 247, 0.15) 0%, rgba(13, 13, 20, 1) 70%);
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(159, 18, 57, 0.1) 0%, transparent 40%);
     }
 
     .hero h1 {
       font-size: clamp(2.5rem, 5vw, 4.5rem);
       margin-bottom: 24px;
-      color: #ffffff;
+      color: var(--text);
     }
 
     .hero-sub {
@@ -215,8 +230,11 @@
 
     .card:hover {
       transform: translateY(-4px);
-      border-color: var(--accent);
     }
+    
+    .pricing-grid .card:nth-child(1):hover { border-color: var(--color-gold); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15); }
+    .pricing-grid .card:nth-child(2):hover { border-color: var(--color-green); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15); }
+    .pricing-grid .card:nth-child(3):hover { border-color: var(--color-blue); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15); }
 
     .card-icon {
       font-size: 2rem;
@@ -267,7 +285,7 @@
       font-family: var(--font-mono);
       font-size: 3rem;
       font-weight: 700;
-      color: var(--border);
+      color: rgba(159, 18, 57, 0.2); /* Red Moon faded */
       margin-bottom: 16px;
       line-height: 1;
     }
