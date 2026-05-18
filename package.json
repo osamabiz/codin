@@ -204,7 +204,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:integration": "vscode-test",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test -c test/e2e/playwright.config.ts",
     "test:all": "npm test && npm run test:integration && npm run test:e2e"
   },
   "devDependencies": {

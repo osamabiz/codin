@@ -2,8 +2,10 @@ import * as vscode from 'vscode';
 import * as assert from 'assert';
 
 suite('Settings', () => {
-  test('provider setting defaults to claude', () => {
+  test('provider setting defaults to claude', async () => {
     const config = vscode.workspace.getConfiguration('codin');
+    await config.update('provider', undefined, vscode.ConfigurationTarget.Workspace);
+    await config.update('provider', undefined, vscode.ConfigurationTarget.Global);
     assert.strictEqual(config.get('provider'), 'claude');
   });
 
@@ -21,7 +23,8 @@ suite('Settings', () => {
   test('can update provider setting', async () => {
     const config = vscode.workspace.getConfiguration('codin');
     await config.update('provider', 'openai', vscode.ConfigurationTarget.Workspace);
-    assert.strictEqual(config.get('provider'), 'openai');
+    const updatedConfig = vscode.workspace.getConfiguration('codin');
+    assert.strictEqual(updatedConfig.get('provider'), 'openai');
     // Restore
     await config.update('provider', 'claude', vscode.ConfigurationTarget.Workspace);
   });

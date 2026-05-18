@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 
-// Helper to get tool registry — resolved from compiled output
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+// Helper to get tool registry
 function getToolRegistry(): { getTool: (name: string) => { execute: (input: unknown, ctx: unknown) => Promise<{ ok: boolean; output?: string; error?: string }> } } {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { allTools } = require('../../../../out/tools/index');
+  const { allTools } = require('../../../out/tools/index.js');
   return {
     getTool: (name: string) => {
       const tool = (allTools as Array<{ name: string; execute: (input: unknown, ctx: unknown) => Promise<{ ok: boolean; output?: string; error?: string }> }>).find((t) => t.name === name);

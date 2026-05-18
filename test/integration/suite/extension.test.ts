@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 suite('Extension activation', () => {
   test('extension activates without error', async () => {
-    const ext = vscode.extensions.getExtension('open-source.vscode-agent');
+    const ext = vscode.extensions.getExtension('open-source.codin');
     assert.ok(ext, 'Extension not found');
     await ext!.activate();
     assert.ok(ext!.isActive, 'Extension is not active');

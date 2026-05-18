@@ -12,5 +12,5 @@
 # Error details
 
 ```
-Test timeout of 60000ms exceeded.
+Error: Protocol error (Runtime.evaluate): Cannot find context with specified id
 ```
